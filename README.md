@@ -6,7 +6,19 @@ Basic experimentation with Windows drivers [based off the MSDN docs](https://doc
 
 ## Debugging
 
-You'll need to first configure a target machine or VM for deployment and debugging. [See here](https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/provision-a-target-computer-wdk-8-1). Note that you need to ensure the target and host can ping each other. You may need to change the VM to use a Bridged connection and allow [File and Printer Sharing](https://stackoverflow.com/questions/18278409/cant-ping-a-local-vm-from-the-host) on both the host and the target. You may then need to set up your [Debug Print Filter](https://stackoverflow.com/questions/17109074/kdprintex-in-debugger-immediate-window-into-vs-2012-is-not-printing-any-msg). Once deployed and installed on the target, you'll need to start WndDbg session e.g. `WinDbg -k net:port=<port>,key=<key>`. WinDbg is located in your Windows kit, e.g. `A:\Windows Kits\10\Debuggers\x64`. Note that `KdPrintEx` does not appear to do anything in `DriverEntry()`, so don't expect output when walking through this symbol.
+You'll need to first configure a target machine or VM for deployment and debugging. [See here](https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/provision-a-target-computer-wdk-8-1). Note that you need to ensure the target and host can ping each other. You may need to change the VM to use a Bridged connection and allow [File and Printer Sharing](https://stackoverflow.com/questions/18278409/cant-ping-a-local-vm-from-the-host) on both the host and the target. You may then need to set up your [Debug Print Filter](https://stackoverflow.com/questions/17109074/kdprintex-in-debugger-immediate-window-into-vs-2012-is-not-printing-any-msg). Once deployed and installed on the target, you'll need to start WndDbg session through an elevated command prompt e.g. `WinDbg -k net:port=<port>,key=<key>`. WinDbg is located in your Windows kit, e.g. `A:\Windows Kits\10\Debuggers\x64`. Note that `KdPrintEx` does not appear to do anything in `DriverEntry()`, so don't expect output when walking through this symbol.
+
+## WinDbg
+
+* To add a breakpoint through WnDbg, use `bm <module>!<symbol>`, e.g. `bm KmdfHelloWorld!DriverEntry`
+* To list all breakpoints, use `bl`;
+* To list all running modules, use `lm`;
+* To list all symbols in a module, use `x <module>!<symbol-search-string>` e.g. `x KmdfHelloWorld!Driver*`
+* `bc` - clears a breakpoint from the list. Use bc * to clear all breakpoints.
+* `bd` - disables a breakpoint. Use bd * to disable all breakpoints.
+* `be` - enables a breakpoint. Use be * to enable all breakpoints.
+
+See the [step-by-step lab](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debug-universal-drivers---step-by-step-lab--echo-kernel-mode-) for further information.
 
 ## Other notes
 
