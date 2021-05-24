@@ -3,8 +3,8 @@
 
 // Based on https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/writing-a-very-small-kmdf--driver
 
-DRIVER_INITIALIZE DriverEntry;
-EVT_WDF_DRIVER_DEVICE_ADD KmdfHelloWorldEvtDeviceAdd;
+extern "C" DRIVER_INITIALIZE DriverEntry;
+extern "C" EVT_WDF_DRIVER_DEVICE_ADD KmdfHelloWorldEvtDeviceAdd;
 
 /*
 * DriverEntry is the entry point for all drivers, like Main() is for many user mode applications. 
