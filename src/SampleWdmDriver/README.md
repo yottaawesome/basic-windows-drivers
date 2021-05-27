@@ -18,7 +18,7 @@ Once you are satisfied, you can stop the sample driver with `sc stop sample` and
 
 ## What this driver does
 
-The driver outputs some debug logging in its `DriverEntry()` and `DriverUnload()` routines. To view this output, you'll need to create the key `HKLM\SYSTEM\CurrentControlSet\Control\SessionManager\Debug Print Filter` and set a `DWORD` value `IHVDRIVER` to `0x8` (note that this only takes effect on reboot). You can then view the debug output either through a remote Windows Debugger session or through something like SysinternalsSuite's dbgview utility (you'll need to run it elevated and set `Capture > Capture Kernel` to true).
+The driver outputs some debug logging in its `DriverEntry()` and `DriverUnload()` routines. To view this output, you'll need to create the key `HKLM\SYSTEM\CurrentControlSet\Control\SessionManager\Debug Print Filter` and set a `DWORD` value `IHVDRIVER` to `0x8` for informational or `0xF` for all level output (note that this only takes effect on reboot). You can then view the debug output either through a remote Windows Debugger session or through something like SysinternalsSuite's dbgview utility (you'll need to run it elevated and set `Capture > Capture Kernel` to true).
 
 ## Additional notes
 
