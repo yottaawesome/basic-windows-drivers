@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KmdfHelloWorld", "KmdfHelloWorld\KmdfHelloWorld.vcxproj", "{EBE2E2E1-F187-4076-BA31-DF0926D288E9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleWdmDriver", "SampleWdmDriver\SampleWdmDriver.vcxproj", "{283AE4D7-E933-4BDC-9A23-DB91190CBF48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -41,6 +43,30 @@ Global
 		{EBE2E2E1-F187-4076-BA31-DF0926D288E9}.Release|x86.ActiveCfg = Release|Win32
 		{EBE2E2E1-F187-4076-BA31-DF0926D288E9}.Release|x86.Build.0 = Release|Win32
 		{EBE2E2E1-F187-4076-BA31-DF0926D288E9}.Release|x86.Deploy.0 = Release|Win32
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|ARM.ActiveCfg = Debug|ARM
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|ARM.Build.0 = Debug|ARM
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|ARM.Deploy.0 = Debug|ARM
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|ARM64.Build.0 = Debug|ARM64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|x64.ActiveCfg = Debug|x64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|x64.Build.0 = Debug|x64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|x64.Deploy.0 = Debug|x64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|x86.ActiveCfg = Debug|Win32
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|x86.Build.0 = Debug|Win32
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Debug|x86.Deploy.0 = Debug|Win32
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|ARM.ActiveCfg = Release|ARM
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|ARM.Build.0 = Release|ARM
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|ARM.Deploy.0 = Release|ARM
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|ARM64.ActiveCfg = Release|ARM64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|ARM64.Build.0 = Release|ARM64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|ARM64.Deploy.0 = Release|ARM64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|x64.ActiveCfg = Release|x64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|x64.Build.0 = Release|x64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|x64.Deploy.0 = Release|x64
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|x86.ActiveCfg = Release|Win32
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|x86.Build.0 = Release|Win32
+		{283AE4D7-E933-4BDC-9A23-DB91190CBF48}.Release|x86.Deploy.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
