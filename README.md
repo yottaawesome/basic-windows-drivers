@@ -2,7 +2,7 @@
 
 ## Intro
 
-Basic experimentation with Windows drivers [based off the MSDN docs](https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/writing-a-very-small-kmdf--driver).
+Basic experimentation with Windows drivers [based off the MSDN docs](https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/writing-a-very-small-kmdf--driver) and Pavel Yosifovich's Windows Kernel Programming book.
 
 ## Debugging
 
@@ -24,7 +24,7 @@ See the [step-by-step lab](https://docs.microsoft.com/en-us/windows-hardware/dri
 
 * If devcon.exe fails, a log is generated at `c:\windows\inf\setupapi.dev.log`.
 
-## Resource
+## Additional resources
 
 * [Download the WDK](https://docs.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk)
 * [WinDbg basics](https://www.tenforums.com/tutorials/5558-windbg-basics-debugging-crash-dumps-windows-10-a.html)
