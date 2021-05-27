@@ -36,5 +36,5 @@ See the [step-by-step lab](https://docs.microsoft.com/en-us/windows-hardware/dri
 * [Windows Driver Samples](https://github.com/microsoft/Windows-driver-samples)
 * [Debug View](https://docs.microsoft.com/en-us/sysinternals/downloads/debugview)
 * [Getting Started with WinDbg (User-Mode)](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/getting-started-with-windbg)
-* [Pavel Yosifovich's tool](https://github.com/zodiacon/AllTools)
+* [Pavel Yosifovich's tools](https://github.com/zodiacon/AllTools)
 * [Sysinternals utilities](https://docs.microsoft.com/en-us/sysinternals/downloads/)
