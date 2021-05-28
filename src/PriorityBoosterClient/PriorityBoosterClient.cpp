@@ -47,6 +47,7 @@ int main(int argc, char* args[])
         &returned, 
         nullptr
     );
+  
     if (success == false)
     {
         std::wcerr

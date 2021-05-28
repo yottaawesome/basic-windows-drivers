@@ -1,5 +1,7 @@
 #pragma once
 
+typedef unsigned long ULONG;
+
 #define PRIORITY_BOOSTER_DEVICE 0x8000
 /*
 * We need to define out control codes using the CTL_CODE macro. A brief description of the meaning of these macro arguments:
@@ -7,7 +9,7 @@
 * but this is mostly for hardware based drivers. For software drivers like ours, the number doesn’t matter much. Still,
 * Microsoft’s documentation specifies that values for 3rd parties should start with 0x8000.
 * •Function - an ascending number indicating a specific operation. If nothing else, this numbermust be different between
-* different control codes for the same driver. Again, any number willdo, but the official documentation says 3rd party
+* different control codes for the same driver. Again, any number will do, but the official documentation says 3rd party
 * drivers should start with 0x800.
 * •Method - the most important part of the control code. It indicates how the input and
 * output buffers provided by the client pass to the driver. We’ll deal with these values in detail in chapter 6. For
@@ -17,6 +19,8 @@
 * IRP_MJ_DEVICE_CONTROL handler.
 */
 #define IOCTL_PRIORITY_BOOSTER_SET_PRIORITY CTL_CODE(PRIORITY_BOOSTER_DEVICE, 0x800, METHOD_NEITHER, FILE_ANY_ACCESS)
+constexpr ULONG IoctlPriorityBoosterSetPriority = (ULONG)
+	CTL_CODE(PRIORITY_BOOSTER_DEVICE, 0x800, METHOD_NEITHER, FILE_ANY_ACCESS);
 
 struct ThreadData
 { 

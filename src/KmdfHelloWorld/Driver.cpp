@@ -1,10 +1,11 @@
+#pragma warning(disable : 4471) // causes a warning in C++
 #include <ntddk.h>
 #include <wdf.h>
 
 // Based on https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/writing-a-very-small-kmdf--driver
 
 extern "C" DRIVER_INITIALIZE DriverEntry;
-extern "C" EVT_WDF_DRIVER_DEVICE_ADD KmdfHelloWorldEvtDeviceAdd;
+EVT_WDF_DRIVER_DEVICE_ADD KmdfHelloWorldEvtDeviceAdd;
 
 /*
 * DriverEntry is the entry point for all drivers, like Main() is for many user mode applications. 
@@ -36,17 +37,23 @@ DriverEntry(
 
     // Initialize the driver configuration object to register the
     // entry point for the EvtDeviceAdd callback, KmdfHelloWorldEvtDeviceAdd
-    WDF_DRIVER_CONFIG_INIT(&config,
+    WDF_DRIVER_CONFIG_INIT(
+        &config,
         KmdfHelloWorldEvtDeviceAdd
     );
 
     // Finally, create the driver object
-    status = WdfDriverCreate(DriverObject,
+    status = WdfDriverCreate(
+        DriverObject,
         RegistryPath,
         WDF_NO_OBJECT_ATTRIBUTES,
         &config,
         WDF_NO_HANDLE
     );
+
+    if (NT_SUCCESS(status) == false)
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "KmdfHelloWorld::DriverEntry(): WdfDriverCreate() create\n"));
+
     return status;
 }
 
