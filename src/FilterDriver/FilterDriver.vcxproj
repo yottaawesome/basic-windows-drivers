@@ -160,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NfdCore.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NfdCore.hpp" />
