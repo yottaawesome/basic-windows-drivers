@@ -14,7 +14,10 @@ NTSTATUS PriorityBoosterDeviceControl(_In_ PDEVICE_OBJECT DeviceObject, _In_ PIR
 * •Create a device object.
 * •Create a symbolic link to the device object.
 */
-extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT driverObject, _In_ PUNICODE_STRING registryPath)
+extern "C" NTSTATUS DriverEntry(
+	_In_ PDRIVER_OBJECT driverObject, 
+	_In_ PUNICODE_STRING registryPath
+)
 {
 	UNREFERENCED_PARAMETER(registryPath);
 
