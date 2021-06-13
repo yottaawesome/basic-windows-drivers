@@ -39,7 +39,7 @@ int main(int argc, char* args[])
     DWORD returned = 0;
     bool success = DeviceIoControl(
         hDevice,
-        IOCTL_PRIORITY_BOOSTER_SET_PRIORITY,
+        PriorityBooster::IoControl::IoctlPriorityBoosterSetPriority,
         &data, 
         sizeof(data), 
         nullptr, 

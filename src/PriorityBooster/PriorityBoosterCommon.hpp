@@ -19,8 +19,12 @@ typedef unsigned long ULONG;
 * IRP_MJ_DEVICE_CONTROL handler.
 */
 #define IOCTL_PRIORITY_BOOSTER_SET_PRIORITY CTL_CODE(PRIORITY_BOOSTER_DEVICE, 0x800, METHOD_NEITHER, FILE_ANY_ACCESS)
-constexpr ULONG IoctlPriorityBoosterSetPriority = (ULONG)
-	CTL_CODE(PRIORITY_BOOSTER_DEVICE, 0x800, METHOD_NEITHER, FILE_ANY_ACCESS);
+
+namespace PriorityBooster::IoControl
+{
+	constexpr ULONG IoctlPriorityBoosterSetPriority = (ULONG)
+		CTL_CODE(PRIORITY_BOOSTER_DEVICE, 0x800, METHOD_NEITHER, FILE_ANY_ACCESS);
+}
 
 struct ThreadData
 { 
