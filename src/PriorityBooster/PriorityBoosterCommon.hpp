@@ -8,7 +8,7 @@ typedef unsigned long ULONG;
 * •DeviceType - identifies a type of device. This can be one of the FILE_DEVICE_xxx constants defined in the WDK headers,
 * but this is mostly for hardware based drivers. For software drivers like ours, the number doesn’t matter much. Still,
 * Microsoft’s documentation specifies that values for 3rd parties should start with 0x8000.
-* •Function - an ascending number indicating a specific operation. If nothing else, this numbermust be different between
+* •Function - an ascending number indicating a specific operation. If nothing else, this number must be different between
 * different control codes for the same driver. Again, any number will do, but the official documentation says 3rd party
 * drivers should start with 0x800.
 * •Method - the most important part of the control code. It indicates how the input and

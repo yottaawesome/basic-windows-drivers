@@ -19,6 +19,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="priority_booster.ixx" />
     <ClCompile Include="PriorityBooster.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
