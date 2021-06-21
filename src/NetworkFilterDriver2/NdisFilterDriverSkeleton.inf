@@ -54,7 +54,7 @@ Copyfiles = ndislwf.copyfiles.sys
 [SourceDisksFiles]
 ; TODO: Customize the name of your binary here.
 ; Also include any related files that should be installed with your driver.
-NetworkFilterDriver2.sys=1
+NdisFilterDriverSkeleton.sys=1
 
 [DestinationDirs]
 DefaultDestDir=12
@@ -62,7 +62,7 @@ ndislwf.copyfiles.sys=12
 
 [ndislwf.copyfiles.sys]
 ; TODO: Customize the name of your binary here.
-NetworkFilterDriver2.sys,,,2
+NdisFilterDriverSkeleton.sys,,,2
 
 
 ;-------------------------------------------------------------------------
@@ -146,7 +146,7 @@ ServiceType     = 1 ;SERVICE_KERNEL_DRIVER
 StartType       = 1 ;SERVICE_SYSTEM_START
 ErrorControl    = 1 ;SERVICE_ERROR_NORMAL
 ; TODO: Customize this to your binary's filename.
-ServiceBinary   = %12%\NetworkFilterDriver2.sys
+ServiceBinary   = %12%\NdisFilterDriverSkeleton.sys
 LoadOrderGroup  = NDIS
 Description     = %NdisLwf_Desc%
 AddReg          = Common.Params.reg, NdisImPlatformBindingOptions.reg
