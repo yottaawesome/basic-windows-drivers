@@ -9,15 +9,15 @@ NDIS_HANDLE         FilterDriverHandle; // NDIS handle for filter driver
 NDIS_HANDLE         FilterDriverObject;
 PDEVICE_OBJECT      NdisDeviceObject = NULL;
 
-#define FILTER_MAJOR_NDIS_VERSION   NDIS_FILTER_MAJOR_VERSION
-#define FILTER_MINOR_NDIS_VERSION   NDIS_FILTER_MINOR_VERSION
-#define FILTER_FRIENDLY_NAME        L"NDIS Sample LightWeight Filter"
+constexpr UCHAR FILTER_MAJOR_NDIS_VERSION = NDIS_FILTER_MAJOR_VERSION;
+constexpr UCHAR FILTER_MINOR_NDIS_VERSION = NDIS_FILTER_MINOR_VERSION;
+const wchar_t FILTER_FRIENDLY_NAME[] = L"NDIS Sample LightWeight Filter";
 // TODO: Customize this to match the GUID in the INF
-#define FILTER_UNIQUE_NAME          L"{5cbf81bd-5055-47cd-9055-a76b2b4e3697}" //unique name, quid name
+const wchar_t FILTER_UNIQUE_NAME[] = L"{5cbf81bd-5055-47cd-9055-a76b2b4e3697}"; //unique name, quid name
 // TODO: Customize this to match the service name in the INF
-#define FILTER_SERVICE_NAME         L"NDISLWF"
-#define LINKNAME_STRING             L"\\DosDevices\\NDISLWF"
-#define NTDEVICE_STRING             L"\\Device\\NDISLWF"
+const wchar_t FILTER_SERVICE_NAME[] = L"NDISLWF";
+const wchar_t LINKNAME_STRING[] = L"\\DosDevices\\NDISLWF";
+const wchar_t NTDEVICE_STRING[] = L"\\Device\\NDISLWF";
 
 NDIS_STATUS
 FilterAttach(
