@@ -1,6 +1,9 @@
 #pragma once
 #include "stdafx.hpp"
 
+// For a breakdown of filter states, see:
+// https://docs.microsoft.com/en-us/windows-hardware/drivers/network/filter-module-states-and-operations
+
 NDIS_STATUS FilterAttach(
     _In_ NDIS_HANDLE                     NdisFilterHandle,
     _In_ NDIS_HANDLE                     FilterDriverContext,
