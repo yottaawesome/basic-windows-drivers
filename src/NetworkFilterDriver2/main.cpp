@@ -1,52 +1,7 @@
 #include "stdafx.hpp"
-
-NDIS_HANDLE         NdisFilterDeviceHandle = NULL;
-NDIS_HANDLE         FilterDriverHandle; // NDIS handle for filter driver
-NDIS_HANDLE         FilterDriverObject;
-PDEVICE_OBJECT      NdisDeviceObject = NULL;
-
-constexpr UCHAR FILTER_MAJOR_NDIS_VERSION = NDIS_FILTER_MAJOR_VERSION;
-constexpr UCHAR FILTER_MINOR_NDIS_VERSION = NDIS_FILTER_MINOR_VERSION;
-const wchar_t FILTER_FRIENDLY_NAME[] = L"NDIS Sample LightWeight Filter";
-// TODO: Customize this to match the GUID in the INF
-const wchar_t FILTER_UNIQUE_NAME[] = L"{5cbf81bd-5055-47cd-9055-a76b2b4e3697}"; //unique name, quid name
-// TODO: Customize this to match the service name in the INF
-const wchar_t FILTER_SERVICE_NAME[] = L"NDISLWF";
-const wchar_t LINKNAME_STRING[] = L"\\DosDevices\\NDISLWF";
-const wchar_t NTDEVICE_STRING[] = L"\\Device\\NDISLWF";
-
-NDIS_STATUS
-FilterAttach(
-    NDIS_HANDLE                     NdisFilterHandle,
-    NDIS_HANDLE                     FilterDriverContext,
-    PNDIS_FILTER_ATTACH_PARAMETERS  AttachParameters
-)
-{
-    UNREFERENCED_PARAMETER(NdisFilterHandle);
-    UNREFERENCED_PARAMETER(FilterDriverContext);
-    UNREFERENCED_PARAMETER(AttachParameters);
-
-    return STATUS_SUCCESS;
-}
-
-VOID
-FilterDetach(
-    NDIS_HANDLE     FilterModuleContext
-)
-{
-    UNREFERENCED_PARAMETER(FilterModuleContext);
-}
-
-NDIS_STATUS
-FilterRestart(
-    NDIS_HANDLE                     FilterModuleContext,
-    PNDIS_FILTER_RESTART_PARAMETERS RestartParameters
-)
-{
-    UNREFERENCED_PARAMETER(FilterModuleContext);
-    UNREFERENCED_PARAMETER(RestartParameters);
-    return STATUS_SUCCESS;
-}
+#include "Constants.hpp"
+#include "Globals.hpp"
+#include "FilterCallbacks.hpp"
 
 typedef struct _FILTER_DEVICE_EXTENSION
 {
@@ -60,10 +15,7 @@ extern "C" NTSTATUS DriverEntry(
 );
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
-VOID
-FilterDeregisterDevice(
-	VOID
-)
+void FilterDeregisterDevice()
 {
 	if (NdisFilterDeviceHandle != NULL)
 	{
@@ -73,20 +25,7 @@ FilterDeregisterDevice(
 	NdisFilterDeviceHandle = NULL;
 }
 
-NDIS_STATUS
-FilterPause(
-    NDIS_HANDLE                     FilterModuleContext,
-    PNDIS_FILTER_PAUSE_PARAMETERS   PauseParameters
-)
-{
-    UNREFERENCED_PARAMETER(FilterModuleContext);
-    UNREFERENCED_PARAMETER(PauseParameters);
-
-    return STATUS_SUCCESS;
-}
-
-NTSTATUS
-FilterDispatch(
+NTSTATUS FilterDispatch(
     PDEVICE_OBJECT       DeviceObject,
     PIRP                 Irp
 )
@@ -122,8 +61,7 @@ FilterDispatch(
     return Status;
 }
 
-NTSTATUS
-FilterDeviceIoControl(
+NTSTATUS FilterDeviceIoControl(
     PDEVICE_OBJECT        DeviceObject,
     PIRP                  Irp
 )
@@ -177,10 +115,7 @@ FilterDeviceIoControl(
 }
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
-NDIS_STATUS
-FilterRegisterDevice(
-    VOID
-)
+NDIS_STATUS FilterRegisterDevice()
 {
     NDIS_STATUS            Status = NDIS_STATUS_SUCCESS;
     UNICODE_STRING         DeviceName;
