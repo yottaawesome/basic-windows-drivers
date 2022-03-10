@@ -4,8 +4,8 @@
 
 [Version]
 Signature="$WINDOWS NT$"
-Class=Sample ; TODO: edit Class
-ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Class=Sample1 ; TODO: edit Class
+ClassGuid={2F5372E3-A4C0-4FB3-B952-10271855192B} ; TODO: edit ClassGuid
 Provider=%ManufacturerName%
 CatalogFile=KmdfHelloWorld.cat
 DriverVer= ; TODO: set DriverVer in stampinf property pages
@@ -81,7 +81,7 @@ KmdfLibraryVersion = $KMDFVERSION$
 [Strings]
 SPSVCINST_ASSOCSERVICE= 0x00000002
 ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
-ClassName="Samples" ; TODO: edit ClassName
+ClassName="Sample1" ; TODO: edit ClassName
 DiskName = "KmdfHelloWorld Installation Disk"
 KmdfHelloWorld.DeviceDesc = "KmdfHelloWorld Device"
 KmdfHelloWorld.SVCDESC = "KmdfHelloWorld Service"

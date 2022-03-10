@@ -10,7 +10,13 @@ You'll need to first configure a target machine or VM for deployment and debuggi
 
 ## Building
 
+You need Visual Studio 2019 and the Windows Driver Kit (WKD) to build and develop kernel components. Visual Studio 2022 is not currently supported by the WDK, although this will change in the future.
+
 If you receive obscure errors related to inf2cat to dates in the `DriverVer` field in the `*.inf` files, ensure that in `Project Properties > Configuration Properties > Inf2Cat > General > Use local time` is set to `Yes (/uselocaltime)`. See [here](https://stackoverflow.com/questions/14148500/int2cat-driverver-set-to-incorrect-date) and [here](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/stampinf-command-options) for additional information.
+
+## Deploying
+
+Provisioned VMs require binaries to be signed, or they'll be blocked by Microsoft Defender. As part of the VM provisioning process, development certificates for signing drivers will be generated. The `SignTool` comes with the Windows Kit (e.g. under `C:\Program Files (x86)\Windows Kits\10\App Certification Kit\`) and can be used like so to sign a binary: `SignTool.exe Sign -A -V <binary_path>.
 
 ## WinDbg
 
@@ -24,9 +30,11 @@ If you receive obscure errors related to inf2cat to dates in the `DriverVer` fie
 
 See the [step-by-step lab](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debug-universal-drivers---step-by-step-lab--echo-kernel-mode-) for further information.
 
-## Other notes
+## Other notes and common problems
 
 * If devcon.exe fails, a log is generated at `c:\windows\inf\setupapi.dev.log`.
+* If you get an error about `No file digest algorithm specified. Please specify the digest algorithm with the /fd flag. Using /fd SHA256 is recommended and more secure than SHA1. Calling signtool with /fd sha1 is equivalent to the previous behavior. In order to select the hash algorithm used in the signing certificate's signature, use the /fd certHash option.`, right click the project > `Configuration Properties` > `Driver Signing` > `General` > `File Digest Algorithm` > `SHA256`.
+* Newer versions of the WDK do not accept `Sample` as a class name in the INF file, and you'll also need to generate a new GUID.
 
 ## Additional resources
 
