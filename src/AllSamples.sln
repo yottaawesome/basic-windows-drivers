@@ -13,7 +13,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PriorityBoosterClient", "Pr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetworkFilterDriver", "FilterDriver\FilterDriver.vcxproj", "{A2D2C3CB-76C8-4DB0-B5DF-3A2C974B30EC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetworkFilterDriver2", "NetworkFilterDriver2\NetworkFilterDriver2.vcxproj", "{69D0DAA9-FE91-43ED-AC0B-277EFE5BF0D6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NdisFilterDriverSkeleton", "NetworkFilterDriver2\NetworkFilterDriver2.vcxproj", "{69D0DAA9-FE91-43ED-AC0B-277EFE5BF0D6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WPFCalloutDriver", "WPFCalloutDriver\WPFCalloutDriver.vcxproj", "{F3FC1923-0184-4860-8661-F30D836AFB6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -159,6 +161,30 @@ Global
 		{69D0DAA9-FE91-43ED-AC0B-277EFE5BF0D6}.Release|x86.ActiveCfg = Release|Win32
 		{69D0DAA9-FE91-43ED-AC0B-277EFE5BF0D6}.Release|x86.Build.0 = Release|Win32
 		{69D0DAA9-FE91-43ED-AC0B-277EFE5BF0D6}.Release|x86.Deploy.0 = Release|Win32
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|ARM.ActiveCfg = Debug|ARM
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|ARM.Build.0 = Debug|ARM
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|ARM.Deploy.0 = Debug|ARM
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|ARM64.Build.0 = Debug|ARM64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|x64.ActiveCfg = Debug|x64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|x64.Build.0 = Debug|x64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|x64.Deploy.0 = Debug|x64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|x86.ActiveCfg = Debug|Win32
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|x86.Build.0 = Debug|Win32
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Debug|x86.Deploy.0 = Debug|Win32
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|ARM.ActiveCfg = Release|ARM
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|ARM.Build.0 = Release|ARM
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|ARM.Deploy.0 = Release|ARM
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|ARM64.ActiveCfg = Release|ARM64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|ARM64.Build.0 = Release|ARM64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|ARM64.Deploy.0 = Release|ARM64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|x64.ActiveCfg = Release|x64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|x64.Build.0 = Release|x64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|x64.Deploy.0 = Release|x64
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|x86.ActiveCfg = Release|Win32
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|x86.Build.0 = Release|Win32
+		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|x86.Deploy.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
