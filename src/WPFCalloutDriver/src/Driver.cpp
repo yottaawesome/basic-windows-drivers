@@ -20,13 +20,7 @@ Environment:
 #pragma alloc_text (INIT, DriverEntry)
 #endif
 
-NTSTATUS
-DriverEntry(
-    _In_ PDRIVER_OBJECT  DriverObject,
-    _In_ PUNICODE_STRING RegistryPath
-    )
 /*++
-
 Routine Description:
     DriverEntry initializes the driver and is the first routine called by the
     system after the driver is loaded. DriverEntry specifies the other entry
@@ -50,31 +44,38 @@ Return Value:
     STATUS_UNSUCCESSFUL otherwise.
 
 --*/
+NTSTATUS DriverEntry(
+    _In_ PDRIVER_OBJECT  DriverObject,
+    _In_ PUNICODE_STRING RegistryPath
+    )
 {
     WDF_DRIVER_CONFIG config;
     NTSTATUS status;
     WDF_OBJECT_ATTRIBUTES attributes;
 
+    DriverObject->DriverUnload = DriverUnload;
 
-    //
     // Register a cleanup callback so that we can call WPP_CLEANUP when
     // the framework driver object is deleted during driver unload.
-    //
     WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
 
     WDF_DRIVER_CONFIG_INIT(&config,nullptr);
 
-    status = WdfDriverCreate(DriverObject,
-                             RegistryPath,
-                             &attributes,
-                             &config,
-                             WDF_NO_HANDLE
-                             );
+    status = WdfDriverCreate(
+        DriverObject,
+        RegistryPath,
+        &attributes,
+        &config,
+        WDF_NO_HANDLE
+    );
 
     if (!NT_SUCCESS(status)) 
-    {
         return status;
-    }
 
     return status;
+}
+
+void DriverUnload(_In_ PDRIVER_OBJECT driverObject)
+{
+    UNREFERENCED_PARAMETER(driverObject);
 }
