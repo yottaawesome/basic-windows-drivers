@@ -89,7 +89,8 @@ KmdfHelloWorldEvtDeviceAdd(
     KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "KmdfHelloWorld: KmdfHelloWorldEvtDeviceAdd\n"));
 
     // Create the device object
-    status = WdfDeviceCreate(&DeviceInit,
+    status = WdfDeviceCreate(
+        &DeviceInit,
         WDF_NO_OBJECT_ATTRIBUTES,
         &hDevice
     );

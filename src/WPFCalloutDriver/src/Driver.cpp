@@ -1,19 +1,3 @@
-/*++
-
-Module Name:
-
-    driver.c
-
-Abstract:
-
-    This file contains the driver entry points and callbacks.
-
-Environment:
-
-    Kernel-mode Driver Framework
-
---*/
-
 #include "driver.hpp"
 
 #ifdef ALLOC_PRAGMA
@@ -47,21 +31,21 @@ Return Value:
 NTSTATUS DriverEntry(
     _In_ PDRIVER_OBJECT  DriverObject,
     _In_ PUNICODE_STRING RegistryPath
-    )
+)
 {
     WDF_DRIVER_CONFIG config;
-    NTSTATUS status;
     WDF_OBJECT_ATTRIBUTES attributes;
 
     DriverObject->DriverUnload = DriverUnload;
 
-    // Register a cleanup callback so that we can call WPP_CLEANUP when
-    // the framework driver object is deleted during driver unload.
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfobject/nf-wdfobject-wdf_object_attributes_init
     WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
 
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdf_driver_config_init
     WDF_DRIVER_CONFIG_INIT(&config,nullptr);
 
-    status = WdfDriverCreate(
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdfdrivercreate
+    NTSTATUS status = WdfDriverCreate(
         DriverObject,
         RegistryPath,
         &attributes,
@@ -69,8 +53,17 @@ NTSTATUS DriverEntry(
         WDF_NO_HANDLE
     );
 
-    if (!NT_SUCCESS(status)) 
+    if (NT_ERROR(status)) 
         return status;
+
+    // https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayeradd0
+    //FwpmSubLayerAdd0
+
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/fwpsk/nf-fwpsk-fwpscalloutregister0
+    //FwpsCalloutRegister0
+
+    // https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfilteradd0
+    //FwpmFilterAdd0
 
     return status;
 }
