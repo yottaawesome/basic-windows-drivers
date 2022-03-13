@@ -245,7 +245,17 @@
     </DriverSign>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <FilesToPackage Include="$(TargetPath)" />
+    <FilesToPackage Include="A:\Code\cpp\basic-windows-drivers\src\x64\Debug\WFPCalloutDriver.sys">
+      <PackageRelativeDirectory>
+      </PackageRelativeDirectory>
+    </FilesToPackage>
+    <FilesToPackage Include="driver-install.cmd" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      <PackageRelativeDirectory>
+      </PackageRelativeDirectory>
+    </FilesToPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="driver-install.cmd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

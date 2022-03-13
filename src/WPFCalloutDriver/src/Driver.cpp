@@ -75,7 +75,7 @@ NTSTATUS DriverEntry(
     return status;
 }
 
-void DriverUnload(_In_ PDRIVER_OBJECT driverObject)
+void DriverUnload(_In_ PDRIVER_OBJECT DriverObject)
 {
-    UNREFERENCED_PARAMETER(driverObject);
+    UNREFERENCED_PARAMETER(DriverObject);
 }
