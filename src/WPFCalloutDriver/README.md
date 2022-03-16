@@ -10,11 +10,15 @@ This is a WIP bare-minimum WDF-based callout driver. It is primarily based on in
 
 ## Installing
 
-You must first [provision a VM](https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/provision-a-target-computer-wdk-8-1) and meet all other pre-requisites, such as installing the WDK.
-* Open the solution in VS2019 (VS2022 is not supported by the WDK as of the time of this writing) and configure the appropriate target.
-* Right click on WFPCalloutDriver and select `Deploy`. This will deploy the driver to `%systemdrive%\drivertest\drivers` on the target machine.
+You must first [provision a VM](https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/provision-a-target-computer-wdk-8-1) and meet all other pre-requisites, such as [installing the WDK](https://docs.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk).
+* Open the solution in VS2019 (VS2022 is not supported by the WDK as of the time of this writing) and configure the appropriate target. You may need to elevate VS2019 in order to deploy successfully.
+* Right click on the `WFPCalloutDriver` project and select the `Deploy` option from the context menu. This will deploy the driver to `%systemdrive%\drivertest\drivers` on the target machine.
 * On the target machine, open an elevated command prompt and `cd` to `%systemdrive%\drivertest\drivers`.
 * Run `driver-install.cmd` to install the driver. Run `driver-install.cmd -r` to uninstall the driver.
+
+## Viewing debug output
+
+You can WinDbg and attach to the provisioned machine to see some basic debugging information being outputted. If you don't see anything, make sure you have [configured your debug print output](https://stackoverflow.com/questions/17109074/kdprintex-in-debugger-immediate-window-into-vs-2012-is-not-printing-any-msg) on the provisioned VM (note that changes to that setting take effect on reboot).
 
 ## Additional resources
 
