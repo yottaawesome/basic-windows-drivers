@@ -4,6 +4,8 @@
 #pragma alloc_text (INIT, DriverEntry)
 #endif
 
+WDFDEVICE wdfDevice;
+
 /*++
 Routine Description:
     DriverEntry initializes the driver and is the first routine called by the
@@ -33,28 +35,70 @@ NTSTATUS DriverEntry(
     _In_ PUNICODE_STRING RegistryPath
 )
 {
-    WDF_DRIVER_CONFIG config;
-    WDF_OBJECT_ATTRIBUTES attributes;
-
-    DriverObject->DriverUnload = DriverUnload;
+    // See https://docs.microsoft.com/en-us/windows-hardware/drivers/network/specifying-an-unload-function
 
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfobject/nf-wdfobject-wdf_object_attributes_init
+    WDF_OBJECT_ATTRIBUTES attributes;
     WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
 
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdf_driver_config_init
-    WDF_DRIVER_CONFIG_INIT(&config,nullptr);
+    WDF_DRIVER_CONFIG config;
+    WDF_DRIVER_CONFIG_INIT(&config, nullptr);
 
+    // Indicate that this is a non-PNP driver
+    config.DriverInitFlags |= WdfDriverInitNonPnpDriver;
+
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nc-wdfdriver-evt_wdf_driver_unload
+    // WDF Drivers use this, otherwise, WDM drivers use DriverObject->DriverUnload = DriverUnload (https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nc-wdm-driver_unload)
+    config.EvtDriverUnload = DriverUnload;
+
+    WDFDRIVER driver = nullptr;
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdfdrivercreate
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDriverCreate()\n"));
     NTSTATUS status = WdfDriverCreate(
         DriverObject,
         RegistryPath,
         &attributes,
         &config,
-        WDF_NO_HANDLE
+        &driver
     );
-
     if (NT_ERROR(status)) 
         return status;
+
+    // Allocate a device initialization structure
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfcontrol/nf-wdfcontrol-wdfcontroldeviceinitallocate
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfControlDeviceInitAllocate()\n"));
+    PWDFDEVICE_INIT deviceInit = WdfControlDeviceInitAllocate(driver, &SDDL_DEVOBJ_KERNEL_ONLY);
+    if (!deviceInit)
+        return STATUS_FAILED_DRIVER_ENTRY;
+
+    // Set the device characteristics
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdeviceinitsetcharacteristics
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceInitSetCharacteristics()\n"));
+    WdfDeviceInitSetCharacteristics(
+        deviceInit,
+        FILE_DEVICE_SECURE_OPEN,
+        false
+    );
+
+    // Create a framework device object
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdevicecreate
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceCreate()\n"));
+    status = WdfDeviceCreate(&deviceInit, WDF_NO_OBJECT_ATTRIBUTES, &wdfDevice);
+    if (NT_ERROR(status))
+        goto ERRORCLEANUP;
+
+    // Initialization of the framework device object is complete
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfcontrol/nf-wdfcontrol-wdfcontrolfinishinitializing
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfControlFinishInitializing()\n"));
+    WdfControlFinishInitializing(wdfDevice);
+
+    // Get the associated WDM device object
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdevicewdmgetdeviceobject
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceWdmGetDeviceObject()\n"));
+    PDEVICE_OBJECT deviceObject = WdfDeviceWdmGetDeviceObject(wdfDevice);
+    if (!deviceObject)
+        goto ERRORCLEANUP;
 
     // https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayeradd0
     //FwpmSubLayerAdd0
@@ -66,9 +110,16 @@ NTSTATUS DriverEntry(
     //FwpmFilterAdd0
 
     return status;
+
+ERRORCLEANUP:
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdeviceinitfree
+    if (deviceInit)
+        WdfDeviceInitFree(deviceInit);
+    return status;
 }
 
-void DriverUnload(_In_ PDRIVER_OBJECT DriverObject)
+//void DriverUnload(_In_ PDRIVER_OBJECT DriverObject)
+void DriverUnload(_In_ WDFDRIVER DriverObject)
 {
     UNREFERENCED_PARAMETER(DriverObject);
 }

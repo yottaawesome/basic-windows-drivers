@@ -28,11 +28,11 @@ CopyFiles = WFPCalloutDriver.DriverFiles
 [DefaultInstall.ntamd64.Services]
 AddService = %ServiceName%,,WFPCalloutDriver.Service
 
-[DefaultUninstall.ntamd64.]
+[DefaultUninstall.ntamd64]
 DelFiles = WFPCalloutDriver.DriverFiles
 
 [DefaultUninstall.ntamd64.Services]
-DelService = WFPCalloutDriver,0x200 ; SPSVCINST_STOPSERVICE
+DelService = %ServiceName%,0x200 ; SPSVCINST_STOPSERVICE
 
 [WFPCalloutDriver.DriverFiles]
 WFPCalloutDriver.sys,,,0x00000040 ; COPYFLG_OVERWRITE_OLDER_ONLY

@@ -19,11 +19,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="WPFCalloutDriver.inf">
-      <Filter>Driver Files</Filter>
-    </Inf>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="include\Driver.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -35,5 +30,10 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="driver-install.cmd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="WFPCalloutDriver.inf">
+      <Filter>Driver Files</Filter>
+    </Inf>
   </ItemGroup>
 </Project>
