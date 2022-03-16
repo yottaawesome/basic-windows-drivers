@@ -37,9 +37,7 @@ NTSTATUS DriverEntry(
 {
     // See https://docs.microsoft.com/en-us/windows-hardware/drivers/network/specifying-an-unload-function
 
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfobject/nf-wdfobject-wdf_object_attributes_init
-    WDF_OBJECT_ATTRIBUTES attributes;
-    WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
+    
 
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdf_driver_config_init
     WDF_DRIVER_CONFIG config;
@@ -51,6 +49,10 @@ NTSTATUS DriverEntry(
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nc-wdfdriver-evt_wdf_driver_unload
     // WDF Drivers use this, otherwise, WDM drivers use DriverObject->DriverUnload = DriverUnload (https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nc-wdm-driver_unload)
     config.EvtDriverUnload = DriverUnload;
+
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfobject/nf-wdfobject-wdf_object_attributes_init
+    WDF_OBJECT_ATTRIBUTES attributes;
+    WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
 
     WDFDRIVER driver = nullptr;
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdfdrivercreate
@@ -74,12 +76,18 @@ NTSTATUS DriverEntry(
 
     // Set the device characteristics
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdeviceinitsetcharacteristics
-    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceInitSetCharacteristics()\n"));
+    // This is taken from https://docs.microsoft.com/en-us/windows-hardware/drivers/network/creating-a-device-object
+    // It does not work, WdfDeviceInitSetCharacteristics() does not appear to have a characteristic for FILE_DEVICE_SECURE_OPEN
+    // See Characteristics for  https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_device_object
+    /*KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceInitSetCharacteristics()\n"));
     WdfDeviceInitSetCharacteristics(
         deviceInit,
         FILE_DEVICE_SECURE_OPEN,
         false
-    );
+    );*/
+
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceInitSetDeviceType()\n"));
+    WdfDeviceInitSetDeviceType(deviceInit, FILE_DEVICE_NETWORK);
 
     // Create a framework device object
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdevicecreate
