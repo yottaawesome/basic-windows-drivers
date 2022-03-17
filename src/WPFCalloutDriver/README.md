@@ -30,3 +30,4 @@ You can WinDbg and attach to the provisioned machine to see some basic debugging
 * [Windows Filtering Platform](https://docs.microsoft.com/en-us/windows/win32/fwp/windows-filtering-platform-start-page)
 * [Using WDF to develop a driver](https://docs.microsoft.com/en-us/windows-hardware/drivers/wdf/using-the-framework-to-develop-a-driver)
 * [Developing Drivers with the Windows Driver Foundation](https://docs.microsoft.com/en-us/windows-hardware/drivers/wdf/developing-drivers-with-wdf)
+* [Packet Inspection Points](https://docs.microsoft.com/en-us/windows-hardware/drivers/network/packet-inspection-points)

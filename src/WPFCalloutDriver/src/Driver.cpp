@@ -58,6 +58,8 @@ void RegisterCallouts(
     }
 
     UINT32 calloutId = 0;
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/fwpsk/ns-fwpsk-fwps_callout2_
+    // FWPS_CALLOUT3 doesn't appear to be documented, only 0-2 are
     FWPS_CALLOUT3 callout
     {
         .calloutKey = calloutKey,
@@ -65,6 +67,8 @@ void RegisterCallouts(
         .notifyFn = notifyCallout
     };
 
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/fwpsk/nf-fwpsk-fwpscalloutregister0
+    // This should actually be FwpsCalloutRegister3, but it's not documented
     NTSTATUS status = FwpsCalloutRegister3(
         g_deviceObject,
         &callout,
