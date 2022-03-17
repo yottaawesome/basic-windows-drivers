@@ -4,40 +4,82 @@
 #pragma alloc_text (INIT, DriverEntry)
 #endif
 
-WDFDEVICE wdfDevice;
+WDFDEVICE g_wdfDevice;
+PDEVICE_OBJECT g_deviceObject;
 
-/*++
-Routine Description:
-    DriverEntry initializes the driver and is the first routine called by the
-    system after the driver is loaded. DriverEntry specifies the other entry
-    points in the function driver, such as EvtDevice and DriverUnload.
+_Use_decl_annotations_
+void ClassifyFn(
+    const FWPS_INCOMING_VALUES0* inFixedValues,
+    const FWPS_INCOMING_METADATA_VALUES0* inMetaValues,
+    void* layerData,
+    const void* classifyContext,
+    const FWPS_FILTER3* filter,
+    UINT64 flowContext,
+    FWPS_CLASSIFY_OUT0* classifyOut
+)
+{
+    UNREFERENCED_PARAMETER(inFixedValues);
+    UNREFERENCED_PARAMETER(inMetaValues);
+    UNREFERENCED_PARAMETER(layerData);
+    UNREFERENCED_PARAMETER(classifyContext);
+    UNREFERENCED_PARAMETER(filter);
+    UNREFERENCED_PARAMETER(flowContext);
 
-Parameters Description:
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn()\n"));
+    classifyOut->actionType = FWP_ACTION_CONTINUE;
+}
 
-    DriverObject - represents the instance of the function driver that is loaded
-    into memory. DriverEntry must initialize members of DriverObject before it
-    returns to the caller. DriverObject is allocated by the system before the
-    driver is loaded, and it is released by the system after the system unloads
-    the function driver from memory.
+_Use_decl_annotations_
+NTSTATUS NotifyFn(
+    FWPS_CALLOUT_NOTIFY_TYPE notifyType, 
+    const GUID* filterKey, 
+    FWPS_FILTER3* filter
+)
+{
+    UNREFERENCED_PARAMETER(notifyType);
+    UNREFERENCED_PARAMETER(filterKey);
+    UNREFERENCED_PARAMETER(filter);
 
-    RegistryPath - represents the driver specific path in the Registry.
-    The function driver can use the path to store driver related data between
-    reboots. The path does not store hardware instance specific data.
+    return STATUS_SUCCESS;
+}
 
-Return Value:
+void RegisterCallouts(
+    GUID  calloutKey,
+    //GUID* providerKey,
+    //GUID  applicableLayer,
+    FWPS_CALLOUT_CLASSIFY_FN3 classifyCallout,
+    FWPS_CALLOUT_NOTIFY_FN3 notifyCallout
+)
+{
+    if (!g_deviceObject)
+    {
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "RegisterCallouts(): g_deviceObject is nullptr\n"));
+        return;
+    }
 
-    STATUS_SUCCESS if successful,
-    STATUS_UNSUCCESSFUL otherwise.
+    UINT32 calloutId = 0;
+    FWPS_CALLOUT3 callout
+    {
+        .calloutKey = calloutKey,
+        .classifyFn = classifyCallout,
+        .notifyFn = notifyCallout
+    };
 
---*/
+    NTSTATUS status = FwpsCalloutRegister3(
+        g_deviceObject,
+        &callout,
+        &calloutId
+    );
+    if (NT_ERROR(status))
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpsCalloutRegister3() failed\n"));
+}
+
 NTSTATUS DriverEntry(
     _In_ PDRIVER_OBJECT  DriverObject,
     _In_ PUNICODE_STRING RegistryPath
 )
 {
     // See https://docs.microsoft.com/en-us/windows-hardware/drivers/network/specifying-an-unload-function
-
-    
 
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdf_driver_config_init
     WDF_DRIVER_CONFIG config;
@@ -92,21 +134,23 @@ NTSTATUS DriverEntry(
     // Create a framework device object
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdevicecreate
     KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceCreate()\n"));
-    status = WdfDeviceCreate(&deviceInit, WDF_NO_OBJECT_ATTRIBUTES, &wdfDevice);
+    status = WdfDeviceCreate(&deviceInit, WDF_NO_OBJECT_ATTRIBUTES, &g_wdfDevice);
     if (NT_ERROR(status))
         goto ERRORCLEANUP;
 
     // Initialization of the framework device object is complete
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfcontrol/nf-wdfcontrol-wdfcontrolfinishinitializing
     KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfControlFinishInitializing()\n"));
-    WdfControlFinishInitializing(wdfDevice);
+    WdfControlFinishInitializing(g_wdfDevice);
 
     // Get the associated WDM device object
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdevicewdmgetdeviceobject
     KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceWdmGetDeviceObject()\n"));
-    PDEVICE_OBJECT deviceObject = WdfDeviceWdmGetDeviceObject(wdfDevice);
-    if (!deviceObject)
+    g_deviceObject = WdfDeviceWdmGetDeviceObject(g_wdfDevice);
+    if (!g_deviceObject)
         goto ERRORCLEANUP;
+
+    RegisterCallouts(WFP_TEST_CALLOUT, ClassifyFn, NotifyFn);
 
     // https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayeradd0
     //FwpmSubLayerAdd0

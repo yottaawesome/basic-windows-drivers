@@ -13,7 +13,7 @@ PnpLockdown = 1
 [SourceDisksFiles]
 WFPCalloutDriver.sys = 1
 
-[ClassInstall32.nt$ARCH$]
+[ClassInstall32.ntamd64]
 AddReg = WFPCalloutDriverClassReg
 
 [DestinationDirs]
