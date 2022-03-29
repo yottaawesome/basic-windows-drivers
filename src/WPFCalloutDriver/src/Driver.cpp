@@ -6,6 +6,7 @@
 
 WDFDEVICE g_wdfDevice;
 PDEVICE_OBJECT g_deviceObject;
+HANDLE          g_engineHandle;       // handle for the open session to the filter engine
 
 _Use_decl_annotations_
 void ClassifyFn(
@@ -43,24 +44,27 @@ NTSTATUS NotifyFn(
     return STATUS_SUCCESS;
 }
 
-void RegisterCallouts(
+NTSTATUS RegisterCallouts(
     GUID  calloutKey,
-    //GUID* providerKey,
-    //GUID  applicableLayer,
+    GUID* providerKey,
+    GUID  applicableLayer,
     FWPS_CALLOUT_CLASSIFY_FN3 classifyCallout,
     FWPS_CALLOUT_NOTIFY_FN3 notifyCallout
 )
 {
+    //auto x1 = FWPM_LAYER_OUTBOUND_TRANSPORT_V4;
+    //auto x2 = FWPM_LAYER_OUTBOUND_IPPACKET_V4;
+
     if (!g_deviceObject)
     {
         KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "RegisterCallouts(): g_deviceObject is nullptr\n"));
-        return;
+        return STATUS_INVALID_HANDLE;
     }
 
     UINT32 calloutId = 0;
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/fwpsk/ns-fwpsk-fwps_callout2_
     // FWPS_CALLOUT3 doesn't appear to be documented, only 0-2 are
-    FWPS_CALLOUT3 callout
+    FWPS_CALLOUT3 sCallout
     {
         .calloutKey = calloutKey,
         .classifyFn = classifyCallout,
@@ -71,11 +75,35 @@ void RegisterCallouts(
     // This should actually be FwpsCalloutRegister3, but it's not documented
     NTSTATUS status = FwpsCalloutRegister3(
         g_deviceObject,
-        &callout,
+        &sCallout,
         &calloutId
     );
     if (NT_ERROR(status))
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpsCalloutRegister3() failed\n"));
+    {
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpsCalloutRegister3() failed %lu\n", status));
+        return status;
+    }
+
+    wchar_t x[] = L"ToyDriverCallout";
+    FWPM_CALLOUT0 mCallout = {
+        .calloutKey = calloutKey,
+        .displayData = {.name = x },
+        .providerKey = providerKey,
+        .applicableLayer = applicableLayer,
+    };
+    status = FwpmCalloutAdd0(
+        g_engineHandle,
+        &mCallout,
+        nullptr,         // default security desc
+        &calloutId
+    );  // same as about calloutid
+    if (NT_ERROR(status))
+    {
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpmCalloutAdd0() failed %lu\n", status));
+        return status;
+    }
+    //LogInfo("  Added callout: %llu", calloutId);
+    return status;
 }
 
 NTSTATUS DriverEntry(
@@ -83,6 +111,11 @@ NTSTATUS DriverEntry(
     _In_ PUNICODE_STRING RegistryPath
 )
 {
+    FWPM_SESSION0   session = { 0 };
+    FWPM_PROVIDER0  provider = { 0 };
+    wchar_t providerName[] = L"provider name";
+    bool addedProvider = false;
+
     // See https://docs.microsoft.com/en-us/windows-hardware/drivers/network/specifying-an-unload-function
 
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdf_driver_config_init
@@ -154,7 +187,48 @@ NTSTATUS DriverEntry(
     if (!g_deviceObject)
         goto ERRORCLEANUP;
 
-    RegisterCallouts(WFP_TEST_CALLOUT, ClassifyFn, NotifyFn);
+    // Open handle to the filtering engine
+    status = FwpmEngineOpen0(
+        nullptr,                   // The filter engine on the local system
+        RPC_C_AUTHN_DEFAULT,    // Use the Windows authentication service
+        nullptr,                   // Use the calling thread&#39;s credentials
+        &session,               // There are session-specific parameters
+        &g_engineHandle     // Pointer to a variable to receive the handle
+    );
+    if (NT_ERROR(status))
+    {
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpmEngineOpen0() failed\n"));
+        goto ERRORCLEANUP;
+    }
+
+    // Add the provider
+    provider.displayData.name = providerName;
+    provider.providerKey = WFP_PROVIDER_GUID;
+    status = FwpmProviderAdd0(
+        g_engineHandle,
+        (const FWPM_PROVIDER0*)&provider,
+        nullptr
+    ); 
+    if (NT_ERROR(status))
+    {
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpmProviderAdd0() failed %lu\n", status));
+        return status;
+    }
+    addedProvider = true;
+
+    // Register our callouts
+    status = RegisterCallouts(
+        WFP_TEST_CALLOUT,
+        (GUID*)&WFP_PROVIDER_GUID,
+        FWPM_LAYER_INBOUND_IPPACKET_V4,
+        ClassifyFn, 
+        NotifyFn
+    );
+    if (NT_ERROR(status))
+    {
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "RegisterCallouts() failed\n"));
+        goto ERRORCLEANUP;
+    }
 
     // https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayeradd0
     //FwpmSubLayerAdd0
@@ -168,9 +242,14 @@ NTSTATUS DriverEntry(
     return status;
 
 ERRORCLEANUP:
+    if (addedProvider)
+        FwpmProviderDeleteByKey0(g_engineHandle, &WFP_PROVIDER_GUID);
+    if (g_engineHandle)
+        FwpmEngineClose0(g_engineHandle);
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdeviceinitfree
     if (deviceInit)
         WdfDeviceInitFree(deviceInit);
+
     return status;
 }
 

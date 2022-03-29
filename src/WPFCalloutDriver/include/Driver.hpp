@@ -7,10 +7,18 @@
 #include <guiddef.h>
 #include <ndis.h>
 #include <Fwpsk.h>
+#include <fwpmtypes.h>
+#include <fwptypes.h>
+#include <fwpmk.h>
 
 // {2CC08215-0458-4B8B-9B03-1A00F4914599}
 DEFINE_GUID(WFP_TEST_CALLOUT,
 	0x2cc08215, 0x458, 0x4b8b, 0x9b, 0x3, 0x1a, 0x0, 0xf4, 0x91, 0x45, 0x99);
+
+// {270B7DD9-17E7-480E-B25F-04BB81F42495}
+DEFINE_GUID(WFP_PROVIDER_GUID,
+    0x270b7dd9, 0x17e7, 0x480e, 0xb2, 0x5f, 0x4, 0xbb, 0x81, 0xf4, 0x24, 0x95);
+
 
 extern "C" NTSTATUS DriverEntry(
 	_In_ PDRIVER_OBJECT  DriverObject,
