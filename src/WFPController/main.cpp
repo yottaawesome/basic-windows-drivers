@@ -9,6 +9,8 @@
 #include <guiddef.h>
 #include "Guids.hpp"
 
+// WFP error codes: https://docs.microsoft.com/en-us/windows/win32/fwp/wfp-error-codes
+
 HANDLE OpenFilterEngine()
 {
     HANDLE          engineHandle;       // handle for the open session to the filter engine
