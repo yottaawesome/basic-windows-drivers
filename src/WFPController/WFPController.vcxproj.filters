@@ -18,6 +18,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="wfpcontroller.windowsfilteringplatform.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wfpcontroller.windowsfilteringplatform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Guids.hpp">

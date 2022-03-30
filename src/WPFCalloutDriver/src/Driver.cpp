@@ -40,6 +40,7 @@ NTSTATUS NotifyFn(
     UNREFERENCED_PARAMETER(filterKey);
     UNREFERENCED_PARAMETER(filter);
 
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "NotifyFn()\n"));
     return STATUS_SUCCESS;
 }
 
@@ -175,15 +176,6 @@ NTSTATUS DriverEntry(
         goto ERRORCLEANUP;
     }
 
-    // https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayeradd0
-    //FwpmSubLayerAdd0
-
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/fwpsk/nf-fwpsk-fwpscalloutregister0
-    //FwpsCalloutRegister0
-
-    // https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfilteradd0
-    //FwpmFilterAdd0
-
     return status;
 
 ERRORCLEANUP:
@@ -198,4 +190,5 @@ ERRORCLEANUP:
 void DriverUnload(_In_ WDFDRIVER DriverObject)
 {
     UNREFERENCED_PARAMETER(DriverObject);
+    FwpsCalloutUnregisterByKey0(&WFP_TEST_CALLOUT);
 }

@@ -142,6 +142,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="wfpcontroller.windowsfilteringplatform.cpp" />
+    <ClCompile Include="wfpcontroller.windowsfilteringplatform.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Guids.hpp" />
