@@ -1,0 +1,10 @@
+#pragma once
+
+static const GUID WFP_PROVIDER_GUID =
+{
+    // 270B7DD9-17E7-480E-B25F-04BB81F42495
+    0x270B7DD9,
+    0x17E7,
+    0x480E,
+    {0x52, 0x5F, 0x04, 0xBB, 0x81, 0xF4, 0x24, 0x95}
+};
