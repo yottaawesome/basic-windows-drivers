@@ -15,7 +15,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetworkFilterDriver", "Filt
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NdisFilterDriverSkeleton", "NetworkFilterDriver2\NetworkFilterDriver2.vcxproj", "{69D0DAA9-FE91-43ED-AC0B-277EFE5BF0D6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WPFCalloutDriver", "WPFCalloutDriver\WPFCalloutDriver.vcxproj", "{F3FC1923-0184-4860-8661-F30D836AFB6A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WFPCalloutDriver", "WPFCalloutDriver\WPFCalloutDriver.vcxproj", "{F3FC1923-0184-4860-8661-F30D836AFB6A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WFPDrivers", "WFPDrivers", "{70931E61-E24B-498A-BC98-ACAE4240ECFF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WFPController", "WFPController\WFPController.vcxproj", "{D23ADD32-A1AF-4E39-982A-B01FF80E073E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unsorted", "Unsorted", "{C60CC397-B6F6-4359-800B-B4A651624839}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -185,9 +191,25 @@ Global
 		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|x86.ActiveCfg = Release|Win32
 		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|x86.Build.0 = Release|Win32
 		{F3FC1923-0184-4860-8661-F30D836AFB6A}.Release|x86.Deploy.0 = Release|Win32
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Debug|ARM.ActiveCfg = Debug|Win32
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Debug|x64.ActiveCfg = Debug|x64
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Debug|x64.Build.0 = Debug|x64
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Debug|x86.ActiveCfg = Debug|Win32
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Debug|x86.Build.0 = Debug|Win32
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Release|ARM.ActiveCfg = Release|Win32
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Release|ARM64.ActiveCfg = Release|Win32
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Release|x64.ActiveCfg = Release|x64
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Release|x64.Build.0 = Release|x64
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Release|x86.ActiveCfg = Release|Win32
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F3FC1923-0184-4860-8661-F30D836AFB6A} = {70931E61-E24B-498A-BC98-ACAE4240ECFF}
+		{D23ADD32-A1AF-4E39-982A-B01FF80E073E} = {70931E61-E24B-498A-BC98-ACAE4240ECFF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {592290EE-A514-4022-8491-4F8A5416E83B}

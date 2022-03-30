@@ -41,8 +41,8 @@ WFPCalloutDriver.sys,,,0x00000040 ; COPYFLG_OVERWRITE_OLDER_ONLY
    HKR,,,0,%WFPCalloutDriverClassName%
    HKR,,Icon,,-5
    HKR,,SilentInstall,,1
-   HKR,,DeviceCharacteristics,0x10001,0x100                                                        ;/// FLG_ADDREG_BINVALUETYPE | FLG_ADDREG_TYPE_MULTI_SZ, FILE_DEVICE_SECURE_OPEN
-   HKR,,Security,,"D:P(A;;GA;;;SY)(A;;GA;;;BA)(A;;GA;;;LS)"                                        ;/// Permit Generic All access to SYstem, Built-in Admin, and Local System.
+   HKR,,DeviceCharacteristics,0x10001,0x100                     ; FLG_ADDREG_BINVALUETYPE | FLG_ADDREG_TYPE_MULTI_SZ, FILE_DEVICE_SECURE_OPEN
+   HKR,,Security,,"D:P(A;;GA;;;SY)(A;;GA;;;BA)(A;;GA;;;LS)"     ; Permit Generic All access to SYstem, Built-in Admin, and Local System.
 
 [WFPCalloutDriver.Service]
 DisplayName = %ServiceName%
@@ -51,6 +51,8 @@ ServiceType = 1  ; SERVICE_KERNEL_DRIVER
 StartType = 0    ; SERVICE_BOOT_START
 ErrorControl = 1 ; SERVICE_ERROR_NORMAL
 ServiceBinary = %12%\WFPCalloutDriver.sys
+LoadOrderGroup = NDIS                                           ; Load immediately after TCPIP.sys
+Dependencies   = TCPIP
 
 [Strings]
 Provider = "Vasilios Magikarpalis Corporation"

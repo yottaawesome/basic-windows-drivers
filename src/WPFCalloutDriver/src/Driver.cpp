@@ -6,7 +6,7 @@
 
 WDFDEVICE g_wdfDevice;
 PDEVICE_OBJECT g_deviceObject;
-HANDLE          g_engineHandle;       // handle for the open session to the filter engine
+//HANDLE          g_engineHandle;       // handle for the open session to the filter engine
 
 _Use_decl_annotations_
 void ClassifyFn(
@@ -46,8 +46,6 @@ NTSTATUS NotifyFn(
 
 NTSTATUS RegisterCallouts(
     GUID  calloutKey,
-    GUID* providerKey,
-    GUID  applicableLayer,
     FWPS_CALLOUT_CLASSIFY_FN3 classifyCallout,
     FWPS_CALLOUT_NOTIFY_FN3 notifyCallout
 )
@@ -84,24 +82,24 @@ NTSTATUS RegisterCallouts(
         return status;
     }
 
-    wchar_t x[] = L"ToyDriverCallout";
-    FWPM_CALLOUT0 mCallout = {
-        .calloutKey = calloutKey,
-        .displayData = {.name = x },
-        .providerKey = providerKey,
-        .applicableLayer = applicableLayer,
-    };
-    status = FwpmCalloutAdd0(
-        g_engineHandle,
-        &mCallout,
-        nullptr,         // default security desc
-        &calloutId
-    );  // same as about calloutid
-    if (NT_ERROR(status))
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpmCalloutAdd0() failed %lu\n", status));
-        return status;
-    }
+    //wchar_t x[] = L"ToyDriverCallout";
+    //FWPM_CALLOUT0 mCallout = {
+    //    .calloutKey = calloutKey,
+    //    .displayData = {.name = x },
+    //    .providerKey = providerKey,
+    //    .applicableLayer = applicableLayer,
+    //};
+    //status = FwpmCalloutAdd0(
+    //    g_engineHandle,
+    //    &mCallout,
+    //    nullptr,         // default security desc
+    //    &calloutId
+    //);  // same as about calloutid
+    //if (NT_ERROR(status))
+    //{
+    //    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpmCalloutAdd0() failed %lu\n", status));
+    //    return status;
+    //}
     //LogInfo("  Added callout: %llu", calloutId);
     return status;
 }
@@ -113,8 +111,7 @@ NTSTATUS DriverEntry(
 {
     FWPM_SESSION0   session = { 0 };
     FWPM_PROVIDER0  provider = { 0 };
-    wchar_t providerName[] = L"provider name";
-    bool addedProvider = false;
+    //wchar_t providerName[] = L"provider name";
 
     // See https://docs.microsoft.com/en-us/windows-hardware/drivers/network/specifying-an-unload-function
 
@@ -188,21 +185,21 @@ NTSTATUS DriverEntry(
         goto ERRORCLEANUP;
 
     // Open handle to the filtering engine
-    status = FwpmEngineOpen0(
-        nullptr,                   // The filter engine on the local system
-        RPC_C_AUTHN_DEFAULT,    // Use the Windows authentication service
-        nullptr,                   // Use the calling thread&#39;s credentials
-        &session,               // There are session-specific parameters
-        &g_engineHandle     // Pointer to a variable to receive the handle
-    );
-    if (NT_ERROR(status))
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpmEngineOpen0() failed\n"));
-        goto ERRORCLEANUP;
-    }
+    //status = FwpmEngineOpen0(
+    //    nullptr,                   // The filter engine on the local system
+    //    RPC_C_AUTHN_DEFAULT,    // Use the Windows authentication service
+    //    nullptr,                   // Use the calling thread&#39;s credentials
+    //    &session,               // There are session-specific parameters
+    //    &g_engineHandle     // Pointer to a variable to receive the handle
+    //);
+    //if (NT_ERROR(status))
+    //{
+    //    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpmEngineOpen0() failed\n"));
+    //    goto ERRORCLEANUP;
+    //}
 
     // Add the provider
-    provider.displayData.name = providerName;
+    /*provider.displayData.name = providerName;
     provider.providerKey = WFP_PROVIDER_GUID;
     status = FwpmProviderAdd0(
         g_engineHandle,
@@ -214,13 +211,13 @@ NTSTATUS DriverEntry(
         KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpmProviderAdd0() failed %lu\n", status));
         return status;
     }
-    addedProvider = true;
+    addedProvider = true;*/
 
     // Register our callouts
     status = RegisterCallouts(
         WFP_TEST_CALLOUT,
-        (GUID*)&WFP_PROVIDER_GUID,
-        FWPM_LAYER_INBOUND_IPPACKET_V4,
+        //(GUID*)&WFP_PROVIDER_GUID,
+        //FWPM_LAYER_INBOUND_IPPACKET_V4,
         ClassifyFn, 
         NotifyFn
     );
@@ -242,10 +239,10 @@ NTSTATUS DriverEntry(
     return status;
 
 ERRORCLEANUP:
-    if (addedProvider)
+    /*if (addedProvider)
         FwpmProviderDeleteByKey0(g_engineHandle, &WFP_PROVIDER_GUID);
     if (g_engineHandle)
-        FwpmEngineClose0(g_engineHandle);
+        FwpmEngineClose0(g_engineHandle);*/
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdeviceinitfree
     if (deviceInit)
         WdfDeviceInitFree(deviceInit);
