@@ -20,6 +20,7 @@ export namespace WFPController
 			virtual void AddCallouts();
 			virtual void AddSublayer();
 			virtual void AddFilters();
+			virtual void AddFilter(const GUID& layerKey);
 
 		protected:
 			HANDLE m_engineHandle; // handle for the open session to the filter engine

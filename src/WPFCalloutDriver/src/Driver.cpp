@@ -4,7 +4,7 @@
 #pragma alloc_text (INIT, DriverEntry)
 #endif
 
-extern PULONG InitSafeBootMode;
+extern "C" PULONG InitSafeBootMode;
 
 WDFDEVICE g_wdfDevice;
 PDEVICE_OBJECT g_deviceObject;
@@ -20,12 +20,33 @@ void ClassifyFn(
     FWPS_CLASSIFY_OUT0* classifyOut
 )
 {
-    UNREFERENCED_PARAMETER(inFixedValues);
-    UNREFERENCED_PARAMETER(inMetaValues);
     UNREFERENCED_PARAMETER(layerData);
     UNREFERENCED_PARAMETER(classifyContext);
     UNREFERENCED_PARAMETER(filter);
     UNREFERENCED_PARAMETER(flowContext);
+
+    if (inMetaValues->packetDirection == FWP_DIRECTION_INBOUND)
+    {
+
+    }
+    else if (inMetaValues->packetDirection == FWP_DIRECTION_OUTBOUND)
+    {
+
+    }
+
+    switch (inFixedValues->layerId)
+    {
+        case FWPS_LAYER_INBOUND_IPPACKET_V4:
+            break;
+        case FWPS_LAYER_INBOUND_TRANSPORT_V4:
+            break;
+        case FWPS_LAYER_OUTBOUND_IPPACKET_V4:
+            break;
+        case FWPS_LAYER_OUTBOUND_TRANSPORT_V4:
+            break;
+        default:
+            break;
+    }
 
     KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn()\n"));
     classifyOut->actionType = FWP_ACTION_CONTINUE;
@@ -52,9 +73,6 @@ NTSTATUS RegisterCallouts(
     FWPS_CALLOUT_NOTIFY_FN3 notifyCallout
 )
 {
-    //auto x1 = FWPM_LAYER_OUTBOUND_TRANSPORT_V4;
-    //auto x2 = FWPM_LAYER_OUTBOUND_IPPACKET_V4;
-
     if (!g_deviceObject)
     {
         KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "RegisterCallouts(): g_deviceObject is nullptr\n"));
@@ -70,7 +88,6 @@ NTSTATUS RegisterCallouts(
         .classifyFn = classifyCallout,
         .notifyFn = notifyCallout
     };
-
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/fwpsk/nf-fwpsk-fwpscalloutregister0
     // This should actually be FwpsCalloutRegister3, but it's not documented
     NTSTATUS status = FwpsCalloutRegister3(
@@ -96,95 +113,108 @@ NTSTATUS DriverEntry(
     if (*InitSafeBootMode > 0)
         return STATUS_NOT_SAFE_MODE_DRIVER;
 
-    FWPM_SESSION0   session = { 0 };
-    FWPM_PROVIDER0  provider = { 0 };
-
-    // See https://docs.microsoft.com/en-us/windows-hardware/drivers/network/specifying-an-unload-function
-
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdf_driver_config_init
-    WDF_DRIVER_CONFIG config;
-    WDF_DRIVER_CONFIG_INIT(&config, nullptr);
-
-    // Indicate that this is a non-PNP driver
-    config.DriverInitFlags |= WdfDriverInitNonPnpDriver;
-
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nc-wdfdriver-evt_wdf_driver_unload
-    // WDF Drivers use this, otherwise, WDM drivers use DriverObject->DriverUnload = DriverUnload (https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nc-wdm-driver_unload)
-    config.EvtDriverUnload = DriverUnload;
-
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfobject/nf-wdfobject-wdf_object_attributes_init
-    WDF_OBJECT_ATTRIBUTES attributes;
-    WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-
-    WDFDRIVER driver = nullptr;
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdfdrivercreate
-    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDriverCreate()\n"));
-    NTSTATUS status = WdfDriverCreate(
-        DriverObject,
-        RegistryPath,
-        &attributes,
-        &config,
-        &driver
-    );
-    if (NT_ERROR(status)) 
-        return status;
-
-    // Allocate a device initialization structure
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfcontrol/nf-wdfcontrol-wdfcontroldeviceinitallocate
-    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfControlDeviceInitAllocate()\n"));
-    PWDFDEVICE_INIT deviceInit = WdfControlDeviceInitAllocate(driver, &SDDL_DEVOBJ_KERNEL_ONLY);
-    if (!deviceInit)
-        return STATUS_FAILED_DRIVER_ENTRY;
-
-    // Set the device characteristics
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdeviceinitsetcharacteristics
-    // This is taken from https://docs.microsoft.com/en-us/windows-hardware/drivers/network/creating-a-device-object
-    // It does not work, WdfDeviceInitSetCharacteristics() does not appear to have a characteristic for FILE_DEVICE_SECURE_OPEN
-    // See Characteristics for  https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_device_object
-    /*KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceInitSetCharacteristics()\n"));
-    WdfDeviceInitSetCharacteristics(
-        deviceInit,
-        FILE_DEVICE_SECURE_OPEN,
-        false
-    );*/
-
-    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceInitSetDeviceType()\n"));
-    WdfDeviceInitSetDeviceType(deviceInit, FILE_DEVICE_NETWORK);
-
-    // Create a framework device object
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdevicecreate
-    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceCreate()\n"));
-    status = WdfDeviceCreate(&deviceInit, WDF_NO_OBJECT_ATTRIBUTES, &g_wdfDevice);
-    if (NT_ERROR(status))
-        goto ERRORCLEANUP;
-
-    // Initialization of the framework device object is complete
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfcontrol/nf-wdfcontrol-wdfcontrolfinishinitializing
-    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfControlFinishInitializing()\n"));
-    WdfControlFinishInitializing(g_wdfDevice);
-
-    // Get the associated WDM device object
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdevicewdmgetdeviceobject
-    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceWdmGetDeviceObject()\n"));
-    g_deviceObject = WdfDeviceWdmGetDeviceObject(g_wdfDevice);
-    if (!g_deviceObject)
-        goto ERRORCLEANUP;
-
-    // Register our callouts
-    status = RegisterCallouts(
-        WFP_TEST_CALLOUT,
-        ClassifyFn, 
-        NotifyFn
-    );
-    if (NT_ERROR(status))
+    NTSTATUS status = STATUS_FAILED_DRIVER_ENTRY;
+    PWDFDEVICE_INIT deviceInit = nullptr;
+    do
     {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "RegisterCallouts() failed\n"));
-        goto ERRORCLEANUP;
-    }
+        FWPM_SESSION0   session = { 0 };
+        FWPM_PROVIDER0  provider = { 0 };
 
-    return status;
+        // See https://docs.microsoft.com/en-us/windows-hardware/drivers/network/specifying-an-unload-function
 
-ERRORCLEANUP:
+        // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdf_driver_config_init
+        WDF_DRIVER_CONFIG config;
+        WDF_DRIVER_CONFIG_INIT(&config, nullptr);
+
+        // Indicate that this is a non-PNP driver
+        config.DriverInitFlags |= WdfDriverInitNonPnpDriver;
+
+        // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nc-wdfdriver-evt_wdf_driver_unload
+        // WDF Drivers use this, otherwise, WDM drivers use DriverObject->DriverUnload = DriverUnload (https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nc-wdm-driver_unload)
+        config.EvtDriverUnload = DriverUnload;
+
+        // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfobject/nf-wdfobject-wdf_object_attributes_init
+        WDF_OBJECT_ATTRIBUTES attributes;
+        WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
+
+        WDFDRIVER driver = nullptr;
+        // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdfdrivercreate
+        status = WdfDriverCreate(
+            DriverObject,
+            RegistryPath,
+            &attributes,
+            &config,
+            &driver
+        );
+        if (NT_ERROR(status))
+        {
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDriverCreate() failed %lu\n", status));
+            return status;
+        }
+
+        // Allocate a device initialization structure
+        // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfcontrol/nf-wdfcontrol-wdfcontroldeviceinitallocate
+        deviceInit = WdfControlDeviceInitAllocate(driver, &SDDL_DEVOBJ_KERNEL_ONLY);
+        if (!deviceInit)
+        {
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfControlDeviceInitAllocate() failed %lu\n", status));
+            return STATUS_FAILED_DRIVER_ENTRY;
+        }
+
+        // Set the device characteristics
+        // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdeviceinitsetcharacteristics
+        // This is taken from https://docs.microsoft.com/en-us/windows-hardware/drivers/network/creating-a-device-object
+        // It does not work, WdfDeviceInitSetCharacteristics() does not appear to have a characteristic for FILE_DEVICE_SECURE_OPEN
+        // See Characteristics for  https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_device_object
+        /*KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceInitSetCharacteristics()\n"));
+        WdfDeviceInitSetCharacteristics(
+            deviceInit,
+            FILE_DEVICE_SECURE_OPEN,
+            false
+        );*/
+
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceInitSetDeviceType()\n"));
+        WdfDeviceInitSetDeviceType(deviceInit, FILE_DEVICE_NETWORK);
+
+        // Create a framework device object
+        // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdevicecreate
+        status = WdfDeviceCreate(&deviceInit, WDF_NO_OBJECT_ATTRIBUTES, &g_wdfDevice);
+        if (NT_ERROR(status))
+        {
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceCreate() failed %lu\n", status));
+            break;
+        }
+
+        // Initialization of the framework device object is complete
+        // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfcontrol/nf-wdfcontrol-wdfcontrolfinishinitializing
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfControlFinishInitializing()\n"));
+        WdfControlFinishInitializing(g_wdfDevice);
+
+        // Get the associated WDM device object
+        // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdevicewdmgetdeviceobject
+        g_deviceObject = WdfDeviceWdmGetDeviceObject(g_wdfDevice);
+        if (!g_deviceObject)
+        {
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceWdmGetDeviceObject() failed %lu\n", status));
+            break;
+        }
+
+        // Register our callouts
+        status = RegisterCallouts(
+            WFP_TEST_CALLOUT,
+            ClassifyFn,
+            NotifyFn
+        );
+        if (NT_ERROR(status))
+        {
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "RegisterCallouts() failed %lu\n", status));
+            break;
+        }
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WFP driver initialised successfullu \n"));
+        
+        return status;
+    } while (false);
+
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdeviceinitfree
     if (deviceInit)
         WdfDeviceInitFree(deviceInit);

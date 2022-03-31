@@ -163,15 +163,22 @@ namespace WFPController
 		if (!m_engineHandle)
 			throw std::invalid_argument(__FUNCSIG__": engineHandle");
 
-		FWPM_FILTER0 filter{ 0 };
-
-		filter.displayData.name = m_filterName.data();
-		filter.layerKey = FWPM_LAYER_OUTBOUND_IPPACKET_V4; //FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4;
-		filter.action.type = FWP_ACTION_CALLOUT_INSPECTION; // FWP_ACTION_CALLOUT_INSPECTION;        // We're only doing inspection.
-		filter.action.calloutKey = WFP_TEST_CALLOUT;// WDF_AUTH_RECV_ACCEPT_CALLOUT;
-		filter.subLayerKey = WFP_SUBLAYER_GUID;// sublayer.subLayerKey;
-		filter.weight.type = FWP_EMPTY;                            // auto-weight.
-		filter.numFilterConditions = 0;                                    // this applies to all application traffic
+		FWPM_FILTER0 filter
+		{ 
+			.displayData {
+				.name = m_filterName.data()
+			},
+			.layerKey = FWPM_LAYER_OUTBOUND_IPPACKET_V4,
+			.subLayerKey = WFP_SUBLAYER_GUID,
+			.weight {
+				.type = FWP_EMPTY
+			},
+			.numFilterConditions = 0,   // this applies to all application traffic
+			.action = {
+				.type = FWP_ACTION_CALLOUT_INSPECTION, // FWP_ACTION_CALLOUT_INSPECTION;        // We're only doing inspection.
+				.calloutKey = WFP_TEST_CALLOUT
+			},
+		};
 
 		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfilteradd0
 		const DWORD status = FwpmFilterAdd0(
@@ -180,6 +187,39 @@ namespace WFPController
 			nullptr,           // default security desc
 			&m_filterId
 		);     
+		if (status != ERROR_SUCCESS)
+			throw std::runtime_error(std::format("Failed to add filters {}", status));
+	}
+
+	void WindowsFilteringPlatform::AddFilter(const GUID& layerKey)
+	{
+		if (!m_engineHandle)
+			throw std::invalid_argument(__FUNCSIG__": engineHandle");
+
+		FWPM_FILTER0 filter
+		{
+			.displayData {
+				.name = m_filterName.data()
+			},
+			.layerKey = FWPM_LAYER_OUTBOUND_IPPACKET_V4,
+			.subLayerKey = WFP_SUBLAYER_GUID,
+			.weight {
+				.type = FWP_EMPTY
+			},
+			.numFilterConditions = 0,   // this applies to all application traffic
+			.action = {
+				.type = FWP_ACTION_CALLOUT_INSPECTION, // FWP_ACTION_CALLOUT_INSPECTION;        // We're only doing inspection.
+				.calloutKey = WFP_TEST_CALLOUT
+			},
+		};
+
+		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfilteradd0
+		const DWORD status = FwpmFilterAdd0(
+			m_engineHandle,
+			&filter,
+			nullptr,           // default security desc
+			&m_filterId
+		);
 		if (status != ERROR_SUCCESS)
 			throw std::runtime_error(std::format("Failed to add filters {}", status));
 	}
