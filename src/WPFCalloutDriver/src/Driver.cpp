@@ -27,11 +27,11 @@ void ClassifyFn(
 
     if (inMetaValues->packetDirection == FWP_DIRECTION_INBOUND)
     {
-
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() --> inbound packet\n"));
     }
     else if (inMetaValues->packetDirection == FWP_DIRECTION_OUTBOUND)
     {
-
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() --> outbound packet\n"));
     }
 
     switch (inFixedValues->layerId)
@@ -48,7 +48,6 @@ void ClassifyFn(
             break;
     }
 
-    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn()\n"));
     classifyOut->actionType = FWP_ACTION_CONTINUE;
 }
 
@@ -210,7 +209,7 @@ NTSTATUS DriverEntry(
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "RegisterCallouts() failed %lu\n", status));
             break;
         }
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WFP driver initialised successfullu \n"));
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WFP driver initialised successfully\n"));
         
         return status;
     } while (false);
@@ -226,5 +225,8 @@ NTSTATUS DriverEntry(
 void DriverUnload(_In_ WDFDRIVER DriverObject)
 {
     UNREFERENCED_PARAMETER(DriverObject);
-    FwpsCalloutUnregisterByKey0(&WFP_TEST_CALLOUT);
+    if (const NTSTATUS status = FwpsCalloutUnregisterByKey0(&WFP_TEST_CALLOUT); status == STATUS_SUCCESS)
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WFP driver shutdown successfully\n"));
+    else
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WFP failed driver shutdown %lu\n", status));
 }
