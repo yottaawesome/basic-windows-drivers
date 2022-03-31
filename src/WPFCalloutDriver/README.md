@@ -8,6 +8,8 @@ This is a WIP bare-minimum WDF-based callout driver. It is primarily based on in
 * [Microsoft's WFP sample](https://docs.microsoft.com/en-us/samples/microsoft/windows-driver-samples/windows-filtering-platform-sample/)
 * [teddysback's small callout driver](https://github.com/teddysback/netFilter)
 
+The driver's callouts currently are invoked on outbound IPv4 packets, but take no action and simply transparently pass them through.
+
 ## Installing
 
 You must first [provision a VM](https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/provision-a-target-computer-wdk-8-1) and meet all other pre-requisites, such as [installing the WDK](https://docs.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk).

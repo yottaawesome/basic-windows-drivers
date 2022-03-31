@@ -4,6 +4,8 @@
 #pragma alloc_text (INIT, DriverEntry)
 #endif
 
+extern PULONG InitSafeBootMode;
+
 WDFDEVICE g_wdfDevice;
 PDEVICE_OBJECT g_deviceObject;
 
@@ -90,6 +92,10 @@ NTSTATUS DriverEntry(
     _In_ PUNICODE_STRING RegistryPath
 )
 {
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/determining-whether-the-operating-system-is-running-in-safe-mode
+    if (*InitSafeBootMode > 0)
+        return STATUS_NOT_SAFE_MODE_DRIVER;
+
     FWPM_SESSION0   session = { 0 };
     FWPM_PROVIDER0  provider = { 0 };
 
