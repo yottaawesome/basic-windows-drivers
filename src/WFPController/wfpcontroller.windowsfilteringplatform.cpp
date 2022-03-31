@@ -138,19 +138,21 @@ namespace WFPController
 		if (!m_engineHandle)
 			throw std::invalid_argument(__FUNCSIG__": engineHandle");
 
-		FWPM_SUBLAYER0  sublayer = { 0 };
-
-		sublayer.displayData.name = m_sublayerName.data();
-		sublayer.displayData.description = m_sublayerDescription.data();
-		sublayer.subLayerKey = WFP_SUBLAYER_GUID;                    // UuidCreate();
-		sublayer.flags = 0;                                    // FWPM_SUBLAYER_FLAG_PERSISTENT -> Causes sublayer to be persistent, surviving across BFE stop / start.
-		sublayer.weight = FWP_EMPTY;                            //?
-		sublayer.providerKey = (GUID*)&WFP_PROVIDER_GUID;
-
+		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmtypes/ns-fwpmtypes-fwpm_sublayer0
+		const FWPM_SUBLAYER0 sublayer = {
+			.subLayerKey = WFP_SUBLAYER_GUID,
+			.displayData = {
+				.name = m_sublayerName.data(),
+				.description = m_sublayerDescription.data()
+			},
+			.flags = 0,     // FWPM_SUBLAYER_FLAG_PERSISTENT -> Causes sublayer to be persistent, surviving across BFE stop / start.
+			.providerKey = const_cast<GUID*>(&WFP_PROVIDER_GUID),
+			.weight = FWP_EMPTY
+		};
 		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayeradd0
 		const DWORD status = FwpmSubLayerAdd0(
 			m_engineHandle,
-			(const FWPM_SUBLAYER0*)&sublayer,
+			&sublayer,
 			nullptr
 		);
 		if (status != ERROR_SUCCESS)
@@ -163,53 +165,43 @@ namespace WFPController
 		if (!m_engineHandle)
 			throw std::invalid_argument(__FUNCSIG__": engineHandle");
 
-		FWPM_FILTER0 filter
-		{ 
-			.displayData {
-				.name = m_filterName.data()
-			},
-			.layerKey = FWPM_LAYER_OUTBOUND_IPPACKET_V4,
-			.subLayerKey = WFP_SUBLAYER_GUID,
-			.weight {
-				.type = FWP_EMPTY
-			},
-			.numFilterConditions = 0,   // this applies to all application traffic
-			.action = {
-				.type = FWP_ACTION_CALLOUT_INSPECTION, // FWP_ACTION_CALLOUT_INSPECTION;        // We're only doing inspection.
-				.calloutKey = WFP_TEST_CALLOUT
-			},
-		};
-
-		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfilteradd0
-		const DWORD status = FwpmFilterAdd0(
-			m_engineHandle,
-			&filter,
-			nullptr,           // default security desc
-			&m_filterId
-		);     
-		if (status != ERROR_SUCCESS)
-			throw std::runtime_error(std::format("Failed to add filters {}", status));
+		AddFilter(
+			m_filterName,
+			FWPM_LAYER_OUTBOUND_IPPACKET_V4,
+			WFP_SUBLAYER_GUID,
+			WFP_TEST_CALLOUT,
+			FWP_EMPTY,
+			FWP_ACTION_CALLOUT_INSPECTION
+		);
 	}
 
-	void WindowsFilteringPlatform::AddFilter(const GUID& layerKey)
+	void WindowsFilteringPlatform::AddFilter(
+		const std::wstring& filterName,
+		const GUID& layerKey,
+		const GUID& sublayerGuid,
+		const GUID& calloutKey,
+		const FWP_DATA_TYPE weightType,
+		const FWP_ACTION_TYPE actionType
+	)
 	{
 		if (!m_engineHandle)
 			throw std::invalid_argument(__FUNCSIG__": engineHandle");
 
-		FWPM_FILTER0 filter
+		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmtypes/ns-fwpmtypes-fwpm_filter0
+		const FWPM_FILTER0 filter
 		{
 			.displayData {
-				.name = m_filterName.data()
+				.name = const_cast<wchar_t*>(filterName.data())
 			},
-			.layerKey = FWPM_LAYER_OUTBOUND_IPPACKET_V4,
-			.subLayerKey = WFP_SUBLAYER_GUID,
+			.layerKey = layerKey,
+			.subLayerKey = sublayerGuid,
 			.weight {
-				.type = FWP_EMPTY
+				.type = weightType
 			},
 			.numFilterConditions = 0,   // this applies to all application traffic
 			.action = {
-				.type = FWP_ACTION_CALLOUT_INSPECTION, // FWP_ACTION_CALLOUT_INSPECTION;        // We're only doing inspection.
-				.calloutKey = WFP_TEST_CALLOUT
+				.type = actionType,
+				.calloutKey = calloutKey
 			},
 		};
 

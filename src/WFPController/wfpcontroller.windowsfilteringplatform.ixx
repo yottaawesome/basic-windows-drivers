@@ -2,6 +2,7 @@ module;
 
 #include <string>
 #include <Windows.h>
+#include <fwpmu.h>
 
 export module wfpcontroller.windowsfilteringplatform;
 
@@ -20,7 +21,16 @@ export namespace WFPController
 			virtual void AddCallouts();
 			virtual void AddSublayer();
 			virtual void AddFilters();
-			virtual void AddFilter(const GUID& layerKey);
+
+		protected:
+			virtual void AddFilter(
+				const std::wstring& filterName,
+				const GUID& layerKey,
+				const GUID& sublayerGuid,
+				const GUID& calloutKey,
+				const FWP_DATA_TYPE weightType,
+				const FWP_ACTION_TYPE actionType
+			);
 
 		protected:
 			HANDLE m_engineHandle; // handle for the open session to the filter engine
