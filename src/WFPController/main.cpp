@@ -54,6 +54,10 @@ int main(int argc, char* argv[])
             {
                 engine.RegisterProvider();
             }
+            else if (input == "context")
+            {
+                engine.AddContext();
+            }
             else if (input == "callouts")
             {
                 engine.AddCallouts();
@@ -70,17 +74,20 @@ int main(int argc, char* argv[])
             {
                 engine.OpenFilterEngine();
                 engine.RegisterProvider();
+                engine.AddContext();
                 engine.AddSublayer();
                 engine.AddCallouts();
                 engine.AddFilters();
             }
         }
 
+        std::cout << "Bye!\n";
         return 0;
     }
     catch (const std::exception& ex)
     {
-        std::cout << ex.what() << std::endl;
+        std::cout << std::format("Bailing as an exception occurred: {}\n", ex.what());
+        return 1;
     }
 }
 
