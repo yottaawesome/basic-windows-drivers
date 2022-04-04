@@ -10,7 +10,7 @@ You'll need to first configure a target machine or VM for deployment and debuggi
 
 ## Building
 
-You need Visual Studio 2019 and the Windows Driver Kit (WKD) to build and develop kernel components. Visual Studio 2022 is not currently supported by the WDK, although this will change in the future.
+You need Visual Studio 2019 and the Windows Driver Kit (WDK) to build and develop kernel components. Visual Studio 2022 is not currently supported by the WDK, although this will change in the future.
 
 If you receive obscure errors related to inf2cat to dates in the `DriverVer` field in the `*.inf` files, ensure that in `Project Properties > Configuration Properties > Inf2Cat > General > Use local time` is set to `Yes (/uselocaltime)`. See [here](https://stackoverflow.com/questions/14148500/int2cat-driverver-set-to-incorrect-date) and [here](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/stampinf-command-options) for additional information.
 
