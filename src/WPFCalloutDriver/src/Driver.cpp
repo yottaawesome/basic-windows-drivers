@@ -11,45 +11,51 @@ PDEVICE_OBJECT g_deviceObject;
 
 void LogFilter(const FWPS_FILTER3* filter)
 {
-    if (filter)
+    if (!filter)
     {
-        if (filter->providerContext)
-        {
-            if (filter->providerContext->providerData.size)
-            {
-                KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ProviderData %lu\n", filter->providerContext->providerData.size));
-            }
-            else
-            {
-                KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "providerData.size is 0\n"));
-            }
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "filter is null\n"));
+        return;
+    }
+    if (!filter->providerContext)
+    {
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "providerContext is null\n"));
+        return;
+    }
+    if (!filter->providerContext->dataBuffer)
+    {
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "dataBuffer is null\n"));
+        return;
+    }
+    if (!filter->providerContext->dataBuffer->size)
+    {
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "dataBuffer is empty\n"));
+        return;
+    }
 
-            if (filter->providerContext->dataBuffer)
-            {
-                if (filter->providerContext->dataBuffer->size)
-                {
-                    int x = *reinterpret_cast<int*>(filter->providerContext->dataBuffer->data);
-                    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "dataBuffer %lu\n", x));
-                }
-                else
-                {
-                    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "dataBuffer.size is 0\n"));
-                }
-            }
-            else
-            {
-                KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "dataBuffer is null\n"));
-            }
-        }
-        else
-        {
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "providerContext is null\n"));
-        }
-    }
-    else
+    // filter->providerContext->providerData is always null, not matter what I pass for the
+    // providerData at the filter, callout, or provider object creation stages. The MSDN
+    // docs don't really provide any useful information as to why, and the only tangible
+    // sources online refer only to filter->providerContext->dataBuffer instead.
+}
+
+DWORD GetProcessId(const FWPS_FILTER3* filter)
+{
+    if (!filter) 
+        return 0;
+    if (!filter->providerContext) 
+        return 0;
+    if (!filter->providerContext->dataBuffer) 
+        return 0;
+    if (!filter->providerContext->dataBuffer->size) 
+        return 0;
+
+    if (filter->providerContext->dataBuffer->size != sizeof(DWORD))
     {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Filter is null\n"));
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "GetProcessId(): data size mismatch\n"));
+        return 0;
     }
+
+    return *reinterpret_cast<DWORD*>(filter->providerContext->dataBuffer);
 }
 
 _Use_decl_annotations_
@@ -65,10 +71,18 @@ void ClassifyFn(
 {
     UNREFERENCED_PARAMETER(layerData);
     UNREFERENCED_PARAMETER(classifyContext);
-    UNREFERENCED_PARAMETER(filter);
     UNREFERENCED_PARAMETER(flowContext);
+
+    // We only inspect traffic
+    classifyOut->actionType = FWP_ACTION_CONTINUE;
+
+    const DWORD processId = GetProcessId(filter);
+    if (!processId || processId != inMetaValues->processId)
+        return;
+
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/fwpsk/ns-fwpsk-fwps_incoming_metadata_values0_
-    if (inMetaValues->currentMetadataValues & FWPS_METADATA_FIELD_PACKET_DIRECTION)
+    // Not available at this layer
+    /*if (inMetaValues->currentMetadataValues & FWPS_METADATA_FIELD_PACKET_DIRECTION)
     {
         if (inMetaValues->packetDirection == FWP_DIRECTION_INBOUND)
         {
@@ -78,33 +92,29 @@ void ClassifyFn(
         {
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() --> outbound packet\n"));
         }
-    }
+    }*/
 
     switch (inFixedValues->layerId)
     {
         case FWPS_LAYER_INBOUND_IPPACKET_V4:
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() --> FWPS_LAYER_INBOUND_IPPACKET_V4\n"));
-            LogFilter(filter);
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> inbound IPv4 packet\n"));
             break;
 
         case FWPS_LAYER_INBOUND_TRANSPORT_V4:
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() --> FWPS_LAYER_INBOUND_TRANSPORT_V4\n"));
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> inbound TCP\n"));
             break;
 
         case FWPS_LAYER_OUTBOUND_IPPACKET_V4:
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() --> FWPS_LAYER_OUTBOUND_IPPACKET_V4\n"));
-            LogFilter(filter);
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> inbound IPv4 packet\n"));
             break;
 
         case FWPS_LAYER_OUTBOUND_TRANSPORT_V4:
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() --> FWPS_LAYER_OUTBOUND_TRANSPORT_V4\n"));
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> outbound TCP\n"));
             break;
 
         default:
             break;
     }
-
-    classifyOut->actionType = FWP_ACTION_CONTINUE;
 }
 
 _Use_decl_annotations_

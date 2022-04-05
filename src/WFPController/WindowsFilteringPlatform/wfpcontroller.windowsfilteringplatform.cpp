@@ -6,7 +6,7 @@ module;
 #include <format>
 #include <Windows.h>
 #include <fwpmu.h>
-#include "Guids.hpp"
+#include "../Guids.hpp"
 
 module wfpcontroller.windowsfilteringplatform;
 
@@ -40,7 +40,7 @@ namespace WFPController
 		if (!m_engineHandle)
 			throw std::invalid_argument(__FUNCSIG__": engineHandle");
 
-		int data = 321;
+		DWORD data = 321;
 		std::wstring providerName = L"provider name";
 		const FWPM_PROVIDER0  provider = {
 			.providerKey = WFP_PROVIDER_GUID,
@@ -119,18 +119,20 @@ namespace WFPController
 
 	void WindowsFilteringPlatform::AddContext()
 	{
-		int data = 555;
-		FWPM_PROVIDER_CONTEXT3 providerContext = { 0 };
-		FWP_BYTE_BLOB         byteBlob = { 0 };
-		std::wstring contextName = L"WFPSampler's Basic Packet Injection ProviderContext";
-		providerContext.displayData.name = contextName.data();
-		providerContext.providerKey = (GUID*)&WFP_PROVIDER_GUID;
-		providerContext.type = FWPM_GENERAL_CONTEXT;
-		providerContext.dataBuffer = &byteBlob;
-		providerContext.dataBuffer->size = sizeof(data);
-		providerContext.dataBuffer->data = reinterpret_cast<UINT8*>(&data);
+		std::wstring contextName = L"TODO: find a better name for this context";
+		DWORD currentProcessId = GetCurrentProcessId();
+		FWP_BYTE_BLOB byteBlob = { 
+			.size = sizeof(currentProcessId),
+			.data = reinterpret_cast<UINT8*>(&currentProcessId)
+		};
+		FWPM_PROVIDER_CONTEXT3 providerContext = {
+			.providerContextKey = WFP_PROVIDER_CONTEXT_GUID,
+			.displayData = {.name = contextName.data()},
+			.providerKey = (GUID*)&WFP_PROVIDER_GUID,
+			.type = FWPM_GENERAL_CONTEXT,
+			.dataBuffer = &byteBlob,
+		};
 		//UuidCreate(&(providerContext.providerContextKey));
-		providerContext.providerContextKey = WFP_PROVIDER_CONTEXT_GUID;
 		const DWORD status = FwpmProviderContextAdd3(m_engineHandle, &providerContext, nullptr, &m_contextId);
 		if (status != ERROR_SUCCESS)
 			std::cout << std::format("FwpmProviderContextAdd3() failed {:X}\n", status);
@@ -141,7 +143,7 @@ namespace WFPController
 		if (!m_engineHandle)
 			throw std::invalid_argument(__FUNCSIG__": engineHandle");
 
-		int data = 123;
+		DWORD data = 123;
 		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmtypes/ns-fwpmtypes-fwpm_callout0
 		FWPM_CALLOUT0 mCallout = {
 			.calloutKey = WFP_OUTBOUND_IPV4_CALLOUT_GUID,
@@ -266,7 +268,7 @@ namespace WFPController
 		if (!m_engineHandle)
 			throw std::invalid_argument(__FUNCSIG__": engineHandle");
 		
-		int data = 777;
+		DWORD data = 777;
 
 		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmtypes/ns-fwpmtypes-fwpm_filter0
 		const FWPM_FILTER0 filter

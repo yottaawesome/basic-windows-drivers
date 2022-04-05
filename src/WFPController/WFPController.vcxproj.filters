@@ -18,10 +18,49 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="wfpcontroller.windowsfilteringplatform.ixx">
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.windowsfilteringplatform.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="wfpcontroller.windowsfilteringplatform.cpp">
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.windowsfilteringplatform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinSock\wfpcontroller.winsock.winsockinit.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinSock\wfpcontroller.winsock.winsockinit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinSock\wfpcontroller.winsock.winsockerror.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinSock\wfpcontroller.winsock.winsockerror.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Error\wfpcontroller.error.functions.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Error\wfpcontroller.error.functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinSock\wfpcontroller.winsock.socket.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinSock\wfpcontroller.winsock.uniqueptrs.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinSock\wfpcontroller.winsock.socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Error\wfpcontroller.error.win32error.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Error\wfpcontroller.error.win32error.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Strings\wfpcontroller.strings.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Strings\wfpcontroller.strings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
