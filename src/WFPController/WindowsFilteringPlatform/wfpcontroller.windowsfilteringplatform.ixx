@@ -6,7 +6,7 @@ module;
 
 export module wfpcontroller.windowsfilteringplatform;
 
-export namespace WFPController
+export namespace WFPController::WindowsFilteringPlatform
 {
 	export class WindowsFilteringPlatform
 	{

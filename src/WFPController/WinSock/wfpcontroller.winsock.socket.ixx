@@ -2,6 +2,7 @@ module;
 
 #include <string>
 #include <vector>
+#include <windows.h>
 #include <winsock2.h>
 
 export module wfpcontroller.winsock.socket;

@@ -10,7 +10,7 @@ module;
 
 module wfpcontroller.windowsfilteringplatform;
 
-namespace WFPController
+namespace WFPController::WindowsFilteringPlatform
 {
 	WindowsFilteringPlatform::~WindowsFilteringPlatform()
 	{

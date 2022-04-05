@@ -55,7 +55,7 @@ DWORD GetProcessId(const FWPS_FILTER3* filter)
         return 0;
     }
 
-    return *reinterpret_cast<DWORD*>(filter->providerContext->dataBuffer);
+    return *reinterpret_cast<DWORD*>(filter->providerContext->dataBuffer->data);
 }
 
 _Use_decl_annotations_
@@ -69,6 +69,7 @@ void ClassifyFn(
     FWPS_CLASSIFY_OUT0* classifyOut
 )
 {
+    UNREFERENCED_PARAMETER(inMetaValues);
     UNREFERENCED_PARAMETER(layerData);
     UNREFERENCED_PARAMETER(classifyContext);
     UNREFERENCED_PARAMETER(flowContext);
@@ -76,40 +77,35 @@ void ClassifyFn(
     // We only inspect traffic
     classifyOut->actionType = FWP_ACTION_CONTINUE;
 
-    const DWORD processId = GetProcessId(filter);
-    if (!processId || processId != inMetaValues->processId)
-        return;
-
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/fwpsk/ns-fwpsk-fwps_incoming_metadata_values0_
-    // Not available at this layer
-    /*if (inMetaValues->currentMetadataValues & FWPS_METADATA_FIELD_PACKET_DIRECTION)
-    {
-        if (inMetaValues->packetDirection == FWP_DIRECTION_INBOUND)
-        {
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() --> inbound packet\n"));
-        }
-        else if (inMetaValues->packetDirection == FWP_DIRECTION_OUTBOUND)
-        {
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() --> outbound packet\n"));
-        }
-    }*/
-
+    // Not available at the IPV* layers: inMetaValues->packetDirection == FWP_DIRECTION_INBOUND
     switch (inFixedValues->layerId)
     {
         case FWPS_LAYER_INBOUND_IPPACKET_V4:
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> inbound IPv4 packet\n"));
-            break;
-
-        case FWPS_LAYER_INBOUND_TRANSPORT_V4:
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> inbound TCP\n"));
+            //KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> inbound IPv4 packet\n"));
             break;
 
         case FWPS_LAYER_OUTBOUND_IPPACKET_V4:
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> inbound IPv4 packet\n"));
+        {
+            // https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/8c923f6b-ce7d-4246-a919-2424d6e1991f/process-id-from-fwpmlayeroutboundippacketv4-layer
+            // Note that processId is not available at IPV* layers: https://docs.microsoft.com/en-us/windows-hardware/drivers/network/metadata-fields-at-each-filtering-layer
+            // inMetaValues->currentMetadataValues & FWPS_METADATA_FIELD_PROCESS_ID)
+            const size_t runningProcessId = reinterpret_cast<size_t>(PsGetCurrentProcessId());
+            const DWORD processId = GetProcessId(filter);
+            if (!processId || !runningProcessId || processId != runningProcessId)
+                return;
+
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> outbound IPv4 packet\n"));
+            break;
+        }
+            
+
+        case FWPS_LAYER_INBOUND_TRANSPORT_V4:
+            //KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> inbound TCP\n"));
             break;
 
         case FWPS_LAYER_OUTBOUND_TRANSPORT_V4:
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> outbound TCP\n"));
+            //KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> outbound TCP\n"));
             break;
 
         default:

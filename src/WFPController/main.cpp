@@ -9,10 +9,11 @@
 #include <guiddef.h>
 #include "Guids.hpp"
 
-// WFP error codes: https://docs.microsoft.com/en-us/windows/win32/fwp/wfp-error-codes
-
 import wfpcontroller.windowsfilteringplatform;
+import wfpcontroller.winsock.socket;
+import wfpcontroller.winsock.winsockinit;
 
+// WFP error codes: https://docs.microsoft.com/en-us/windows/win32/fwp/wfp-error-codes
 //struct FilterEngineDeleter
 //{
 //    void operator()(HANDLE engineHandle)
@@ -29,7 +30,8 @@ int main(int argc, char* argv[])
     HANDLE engineHandle = nullptr;
     try
     {
-        WFPController::WindowsFilteringPlatform engine;
+        WFPController::WindowsFilteringPlatform::WindowsFilteringPlatform engine;
+        WFPController::WinSock::WinSockInit init;
 
         bool execute = true;
         std::string input;
@@ -78,6 +80,11 @@ int main(int argc, char* argv[])
                 engine.AddSublayer();
                 engine.AddCallouts();
                 engine.AddFilters();
+            }
+            else if (input == "socket-connect")
+            {
+                WFPController::WinSock::Socket socket(L"142.250.70.164", 80);
+                socket.Connect();
             }
         }
 
