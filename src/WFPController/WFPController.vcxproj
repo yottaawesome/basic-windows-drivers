@@ -147,11 +147,16 @@
     <ClCompile Include="Error\wfpcontroller.error.functions.ixx" />
     <ClCompile Include="Error\wfpcontroller.error.win32error.cpp" />
     <ClCompile Include="Error\wfpcontroller.error.win32error.ixx" />
+    <ClCompile Include="wfpcontroller.identifiers.ixx" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Strings\wfpcontroller.strings.cpp" />
     <ClCompile Include="Strings\wfpcontroller.strings.ixx" />
-    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.windowsfilteringplatform.cpp" />
-    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.windowsfilteringplatform.ixx" />
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.callout.cpp" />
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.callout.ixx" />
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.cpp" />
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.ixx" />
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.wfperror.cpp" />
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.wfperror.ixx" />
     <ClCompile Include="WinSock\wfpcontroller.winsock.socket.cpp" />
     <ClCompile Include="WinSock\wfpcontroller.winsock.socket.ixx" />
     <ClCompile Include="WinSock\wfpcontroller.winsock.uniqueptrs.ixx" />
@@ -159,9 +164,6 @@
     <ClCompile Include="WinSock\wfpcontroller.winsock.winsockerror.ixx" />
     <ClCompile Include="WinSock\wfpcontroller.winsock.winsockinit.cpp" />
     <ClCompile Include="WinSock\wfpcontroller.winsock.winsockinit.ixx" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Guids.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

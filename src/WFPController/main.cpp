@@ -1,16 +1,17 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <source_location>
 #include <format>
 #include <stdexcept>
 #include <Windows.h>
 #include <fwpmu.h>
 #include <Winternl.h>
 #include <guiddef.h>
-#include "Guids.hpp"
 
-import wfpcontroller.windowsfilteringplatform;
+import wfpcontroller.wfp;
 import wfpcontroller.winsock.socket;
+import wfpcontroller.wfp.wfperror;
 import wfpcontroller.winsock.winsockinit;
 
 // WFP error codes: https://docs.microsoft.com/en-us/windows/win32/fwp/wfp-error-codes
@@ -30,7 +31,7 @@ int main(int argc, char* argv[])
     HANDLE engineHandle = nullptr;
     try
     {
-        WFPController::WindowsFilteringPlatform::WindowsFilteringPlatform engine;
+        WFPController::WFP::WFPEngine engine;
         WFPController::WinSock::WinSockInit init;
 
         bool execute = true;

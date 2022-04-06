@@ -1,18 +1,21 @@
 module;
 
 #include <string>
+#include <memory>
+#include <format>
 #include <Windows.h>
 #include <fwpmu.h>
 
-export module wfpcontroller.windowsfilteringplatform;
+export module wfpcontroller.wfp;
+import wfpcontroller.wfp.callout;
 
-export namespace WFPController::WindowsFilteringPlatform
+export namespace WFPController::WFP
 {
-	export class WindowsFilteringPlatform
+	export class WFPEngine
 	{
 		public:
-			virtual ~WindowsFilteringPlatform();
-			WindowsFilteringPlatform();
+			virtual ~WFPEngine();
+			WFPEngine();
 
 		public:
 			virtual void Close();
@@ -20,6 +23,9 @@ export namespace WFPController::WindowsFilteringPlatform
 			virtual void RegisterProvider();
 			virtual void AddContext();
 			virtual void AddCallouts();
+			virtual void AddOutboundTCPPacketCallout();
+			virtual void AddOutboundIPv4PacketCallout();
+			virtual void AddInboundIPv4PacketCallout();
 			virtual void AddSublayer();
 			virtual void AddFilters();
 
@@ -35,7 +41,7 @@ export namespace WFPController::WindowsFilteringPlatform
 			);
 
 		protected:
-			HANDLE m_engineHandle; // handle for the open session to the filter engine
+			std::shared_ptr<std::remove_pointer<HANDLE>::type> m_engineHandle; // handle for the open session to the filter engine
 			bool m_addedProvider;
 			bool m_addedSublayer;
 			std::wstring m_sublayerName;
@@ -47,11 +53,12 @@ export namespace WFPController::WindowsFilteringPlatform
 			UINT64 m_filterId2;
 			std::wstring m_filterName2;
 
-			std::wstring m_calloutName;
-			unsigned m_calloutId;
+			Callout m_outboundIPv4Callout;
+			//std::wstring m_calloutName;
+			//unsigned m_calloutId;
 
-			std::wstring m_calloutName2;
-			unsigned m_calloutId2;
+			//std::wstring m_calloutName2;
+			//unsigned m_calloutId2;
 
 			UINT64 m_contextId;
 	};

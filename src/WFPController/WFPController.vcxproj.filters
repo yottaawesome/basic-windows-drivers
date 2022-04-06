@@ -18,10 +18,10 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.windowsfilteringplatform.ixx">
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.windowsfilteringplatform.cpp">
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WinSock\wfpcontroller.winsock.winsockinit.ixx">
@@ -63,10 +63,20 @@
     <ClCompile Include="Strings\wfpcontroller.strings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Guids.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="wfpcontroller.identifiers.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.callout.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.callout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.wfperror.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.wfperror.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
