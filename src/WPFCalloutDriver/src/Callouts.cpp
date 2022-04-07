@@ -10,13 +10,20 @@ namespace ToyDriver::Callouts
             &OutboundIPv4::Key
         );
         if (NT_ERROR(status))
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering WFP_OUTBOUND_IPV4_CALLOUT_GUID: %lu\n", status));
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering OutboundIPv4: %lu\n", status));
 
         status = FwpsCalloutUnregisterByKey0(
             &InboundICMPError::Key
         );
         if (NT_ERROR(status))
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering WFP_INBOUND_ICMP_ERROR_CALLOUT_GUID: %lu\n", status));
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering InboundICMPError: %lu\n", status));
+
+        status = FwpsCalloutUnregisterByKey0(
+            &OutboundICMPError::Key
+        );
+        if (NT_ERROR(status))
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering OutboundICMPError: %lu\n", status));
+
 
         return STATUS_SUCCESS;
     }
@@ -249,7 +256,16 @@ namespace ToyDriver::Callouts::InboundICMPError
         // We only inspect traffic
         classifyOut->actionType = FWP_ACTION_CONTINUE;
 
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__": ICMP inbound error detected\n"));
+        // See https://docs.microsoft.com/en-us/windows-hardware/drivers/network/data-offset-positions
+
+        // Not available
+        //const size_t runningProcessId = reinterpret_cast<size_t>(PsGetCurrentProcessId());
+        const UINT32 remoteIpAddress =
+            inFixedValues->incomingValue[FWPS_FIELD_INBOUND_ICMP_ERROR_V4_IP_REMOTE_ADDRESS].value.uint32;
+        const UINT8 icmpType = inFixedValues->incomingValue[FWPS_FIELD_INBOUND_ICMP_ERROR_V4_ICMP_TYPE].value.uint8;
+        const UINT8 icmpCode = inFixedValues->incomingValue[FWPS_FIELD_INBOUND_ICMP_ERROR_V4_ICMP_CODE].value.uint8;
+
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__": ICMP inbound error detected, remote address: %lu, type %hu, code %hu\n", remoteIpAddress, icmpType, icmpCode));
     }
 
     _Use_decl_annotations_

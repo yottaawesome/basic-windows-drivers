@@ -7,6 +7,7 @@ This is a WIP bare-minimum WDF-based callout driver. It is primarily based on in
 * [MSDN's docs on Callout Drivers](https://docs.microsoft.com/en-us/windows-hardware/drivers/network/roadmap-for-developing-wfp-callout-drivers). See in particular the sections under `Callout Driver Operations`.
 * [Microsoft's WFP sample](https://docs.microsoft.com/en-us/samples/microsoft/windows-driver-samples/windows-filtering-platform-sample/)
 * [teddysback's small callout driver](https://github.com/teddysback/netFilter)
+* [Jared Wright's WFP Starter Kit](https://github.com/JaredWright/WFPStarterKit)
 
 The driver's callouts currently are invoked on outbound IPv4 packets, but take no action other than output some debug logging and simply transparently pass them through.
 

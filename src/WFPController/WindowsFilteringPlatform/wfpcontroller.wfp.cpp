@@ -71,6 +71,7 @@ namespace WFPController::WFP
 		
 		m_outboundIPv4Callout.Remove();
 		m_inboundICMPErrorCallout.Remove();
+		m_outboundICMPErrorCallout.Remove();
 		m_engineHandle = nullptr;
 	}
 
