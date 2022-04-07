@@ -82,10 +82,27 @@ int main(int argc, char* argv[])
                 engine.AddCallouts();
                 engine.AddFilters();
             }
-            else if (input == "socket-connect")
+            else if (input == "connect")
             {
                 WFPController::WinSock::Socket socket(L"142.250.70.164", 80);
                 socket.Connect();
+            }
+            else if (input == "ttl")
+            {
+                try
+                {
+                    WFPController::WinSock::Socket socket(L"142.250.70.164", 80);
+                    socket.SetPreconnectTTL(1);
+                    socket.Connect();
+                }
+                catch (const std::exception& ex)
+                {
+                    std::cout << ex.what() << std::endl;
+                }
+            }
+            else
+            {
+                std::cout << "Error: invalid input\n";
             }
         }
 
@@ -98,4 +115,3 @@ int main(int argc, char* argv[])
         return 1;
     }
 }
-

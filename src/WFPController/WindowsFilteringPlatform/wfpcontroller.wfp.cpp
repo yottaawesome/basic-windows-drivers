@@ -26,15 +26,15 @@ namespace WFPController::WFP
 		: m_addedProvider(false),
 		m_addedSublayer(false),
 		m_engineHandle(nullptr),
-		/*m_calloutName(L"ToyDriverCallout1"),
-		m_calloutName2(L"ToyDriverCallout2"),*/
-		m_filterName(L"IPv4 outbound packet"),
-		m_filterId(0),
-		m_filterName2(L"Filter 2"),
-		m_filterId2(0),
+		m_outboundIPv4FilterName(L"IPv4 outbound packet"),
+		m_outboundIPv4FilterID(0),
+		m_inboundICMPErrorFilterName(L"Inbound ICMP error file"),
+		m_inboundICMPErrorFilterID(0),
 		m_sublayerName(L"ToyCalloutDriverSublayer"),
 		m_sublayerDescription(L"Just a toy sublayer"),
-		m_contextId(0)
+		m_contextId(0),
+		m_outboundICMPErrorFilterID(0),
+		m_outboundICMPErrorFilterName(L"Outbound ICMP error filter")
 	{
 	}
 
@@ -46,7 +46,7 @@ namespace WFPController::WFP
 		DWORD data = 321;
 		std::wstring providerName = L"provider name";
 		const FWPM_PROVIDER0  provider = {
-			.providerKey = Identifiers::WFP_PROVIDER_GUID,
+			.providerKey = Identifiers::ProviderKey,
 			.displayData = {.name = providerName.data()},
 			.providerData = {
 				.size = sizeof(data),
@@ -70,6 +70,7 @@ namespace WFPController::WFP
 			return;
 		
 		m_outboundIPv4Callout.Remove();
+		m_inboundICMPErrorCallout.Remove();
 		m_engineHandle = nullptr;
 	}
 
@@ -82,9 +83,9 @@ namespace WFPController::WFP
 			.data = reinterpret_cast<UINT8*>(&currentProcessId)
 		};
 		FWPM_PROVIDER_CONTEXT3 providerContext = {
-			.providerContextKey = Identifiers::WFP_PROVIDER_CONTEXT_GUID,
+			.providerContextKey = Identifiers::ProviderContextKey,
 			.displayData = {.name = contextName.data()},
-			.providerKey = (GUID*)&Identifiers::WFP_PROVIDER_GUID,
+			.providerKey = (GUID*)&Identifiers::ProviderKey,
 			.type = FWPM_GENERAL_CONTEXT,
 			.dataBuffer = &byteBlob,
 		};
@@ -103,13 +104,39 @@ namespace WFPController::WFP
 	{
 		m_outboundIPv4Callout = Callout(
 			m_engineHandle,
-			Identifiers::WFP_OUTBOUND_IPV4_CALLOUT_GUID,
-			Identifiers::WFP_PROVIDER_GUID,
+			Identifiers::OutboundIPv4CalloutKey,
+			Identifiers::ProviderKey,
 			FWPM_LAYER_OUTBOUND_IPPACKET_V4,
 			FWPM_CALLOUT_FLAG_USES_PROVIDER_CONTEXT,
 			L"Outbound IPv4 Callout"
 		);
-		m_outboundIPv4Callout.Add();
+		m_outboundIPv4Callout.Add();	
+	}
+	
+	void WFPEngine::AddInboundICMPErrorCallout()
+	{
+		m_inboundICMPErrorCallout = Callout(
+			m_engineHandle,
+			Identifiers::InboundICMPErrorCalloutKey,
+			Identifiers::ProviderKey,
+			FWPM_LAYER_INBOUND_ICMP_ERROR_V4,
+			FWPM_CALLOUT_FLAG_USES_PROVIDER_CONTEXT,
+			L"Inbound ICMP Error Callout"
+		);
+		m_inboundICMPErrorCallout.Add();
+	}
+
+	void WFPEngine::AddOutboundICMPErrorCallout()
+	{
+		m_outboundICMPErrorCallout = Callout(
+			m_engineHandle,
+			Identifiers::OutboundICMPErrorCalloutKey,
+			Identifiers::ProviderKey,
+			FWPM_LAYER_OUTBOUND_ICMP_ERROR_V4,
+			FWPM_CALLOUT_FLAG_USES_PROVIDER_CONTEXT,
+			L"Outbound ICMP Error Callout"
+		);
+		m_outboundICMPErrorCallout.Add();
 	}
 
 	void WFPEngine::AddInboundIPv4PacketCallout()
@@ -124,6 +151,8 @@ namespace WFPController::WFP
 
 		AddOutboundTCPPacketCallout();
 		AddOutboundIPv4PacketCallout();
+		AddInboundICMPErrorCallout();
+		AddOutboundICMPErrorCallout();
 		AddInboundIPv4PacketCallout();
 	}
 
@@ -160,13 +189,13 @@ namespace WFPController::WFP
 
 		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmtypes/ns-fwpmtypes-fwpm_sublayer0
 		const FWPM_SUBLAYER0 sublayer = {
-			.subLayerKey = Identifiers::WFP_SUBLAYER_GUID,
+			.subLayerKey = Identifiers::SublayerKey,
 			.displayData = {
 				.name = m_sublayerName.data(),
 				.description = m_sublayerDescription.data()
 			},
 			.flags = 0,     // FWPM_SUBLAYER_FLAG_PERSISTENT -> Causes sublayer to be persistent, surviving across BFE stop / start.
-			.providerKey = const_cast<GUID*>(&Identifiers::WFP_PROVIDER_GUID),
+			.providerKey = const_cast<GUID*>(&Identifiers::ProviderKey),
 			.weight = FWP_EMPTY
 		};
 		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmsublayeradd0
@@ -186,24 +215,34 @@ namespace WFPController::WFP
 			throw std::invalid_argument(__FUNCSIG__": engineHandle");
 
 		AddFilter(
-			m_filterName,
+			m_outboundIPv4FilterName,
 			FWPM_LAYER_OUTBOUND_IPPACKET_V4,
-			Identifiers::WFP_SUBLAYER_GUID,
-			Identifiers::WFP_OUTBOUND_IPV4_CALLOUT_GUID,
+			Identifiers::SublayerKey,
+			Identifiers::OutboundIPv4CalloutKey,
 			FWP_EMPTY,
 			FWP_ACTION_CALLOUT_INSPECTION,
-			m_filterId
+			m_outboundIPv4FilterID
 		);
 
-		/*AddFilter(
-			m_filterName2,
-			FWPM_LAYER_INBOUND_IPPACKET_V4,
-			WFP_SUBLAYER_GUID,
-			WFP_INBOUND_IPV4_CALLOUT_GUID,
+		AddFilter(
+			m_inboundICMPErrorFilterName,
+			FWPM_LAYER_INBOUND_ICMP_ERROR_V4,
+			Identifiers::SublayerKey,
+			Identifiers::InboundICMPErrorCalloutKey,
 			FWP_EMPTY,
 			FWP_ACTION_CALLOUT_INSPECTION,
-			m_filterId2
-		);*/
+			m_inboundICMPErrorFilterID
+		);
+
+		AddFilter(
+			m_outboundICMPErrorFilterName,
+			FWPM_LAYER_OUTBOUND_ICMP_ERROR_V4,
+			Identifiers::SublayerKey,
+			Identifiers::OutboundICMPErrorCalloutKey,
+			FWP_EMPTY,
+			FWP_ACTION_CALLOUT_INSPECTION,
+			m_outboundICMPErrorFilterID
+		);
 	}
 
 	void WFPEngine::AddFilter(
@@ -228,7 +267,7 @@ namespace WFPController::WFP
 				.name = const_cast<wchar_t*>(filterName.data())
 			},
 			.flags = FWPM_FILTER_FLAG_HAS_PROVIDER_CONTEXT,
-			.providerKey = (GUID*)&Identifiers::WFP_PROVIDER_GUID,
+			.providerKey = (GUID*)&Identifiers::ProviderKey,
 			.providerData = {
 				.size = sizeof(data),
 				.data = reinterpret_cast<UINT8*>(&data)
@@ -243,7 +282,7 @@ namespace WFPController::WFP
 				.type = actionType,
 				.calloutKey = calloutKey
 			},
-			.providerContextKey = Identifiers::WFP_PROVIDER_CONTEXT_GUID
+			.providerContextKey = Identifiers::ProviderContextKey
 		};
 
 		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmu/nf-fwpmu-fwpmfilteradd0

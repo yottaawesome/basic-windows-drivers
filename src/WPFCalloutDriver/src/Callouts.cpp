@@ -1,5 +1,4 @@
 #include "Callouts.hpp"
-#include "Identifiers.hpp"
 #include "Globals.hpp"
 #include "Util.hpp"
 
@@ -68,7 +67,7 @@ namespace ToyDriver::Callouts
         );
         if (NT_ERROR(status))
         {
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Registering WFP_OUTBOUND_IPV4_CALLOUT_GUID failed %lu\n", status));
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Registering OutboundIPv4 failed %lu\n", status));
             return status;
         }
 
@@ -79,7 +78,18 @@ namespace ToyDriver::Callouts
         );
         if (NT_ERROR(status))
         {
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Registering WFP_INBOUND_IPV4_CALLOUT_GUID failed %lu\n", status));
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Registering InboundICMP failed %lu\n", status));
+            return status;
+        }
+
+        status = RegisterCallout(
+            OutboundICMPError::Key,
+            OutboundICMPError::ClassifyFn,
+            OutboundICMPError::NotifyFn
+        );
+        if (NT_ERROR(status))
+        {
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Registering OutboundICMP failed %lu\n", status));
             return status;
         }
 
@@ -97,6 +107,42 @@ namespace ToyDriver::Callouts
         }*/
 
         return status;
+    }
+}
+
+namespace ToyDriver::Callouts::OutboundTCP
+{
+    void ClassifyFn(
+        _In_ const FWPS_INCOMING_VALUES0* inFixedValues,
+        _In_ const FWPS_INCOMING_METADATA_VALUES0* inMetaValues,
+        _Inout_opt_ void* layerData,
+        _In_opt_ const void* classifyContext,
+        _In_ const FWPS_FILTER3* filter,
+        _In_ UINT64 flowContext,
+        _Inout_ FWPS_CLASSIFY_OUT0* classifyOut
+    )
+    {
+        UNREFERENCED_PARAMETER(inFixedValues);
+        UNREFERENCED_PARAMETER(inMetaValues);
+        UNREFERENCED_PARAMETER(layerData);
+        UNREFERENCED_PARAMETER(classifyContext);
+        UNREFERENCED_PARAMETER(filter);
+        UNREFERENCED_PARAMETER(flowContext);
+
+        // We only inspect traffic
+        classifyOut->actionType = FWP_ACTION_CONTINUE;
+    }
+
+    NTSTATUS NotifyFn(
+        _In_ FWPS_CALLOUT_NOTIFY_TYPE notifyType,
+        _In_ const GUID* filterKey,
+        _Inout_ FWPS_FILTER3* filter
+    )
+    {
+        UNREFERENCED_PARAMETER(notifyType);
+        UNREFERENCED_PARAMETER(filterKey);
+        UNREFERENCED_PARAMETER(filter);
+        return STATUS_SUCCESS;
     }
 }
 
@@ -127,6 +173,58 @@ namespace ToyDriver::Callouts::InboundIPv4
         // Not available at the IPV* layers: inMetaValues->packetDirection == FWP_DIRECTION_INBOUND
         // inFixedValues->layerId
     }
+
+    NTSTATUS NotifyFn(
+        _In_ FWPS_CALLOUT_NOTIFY_TYPE notifyType,
+        _In_ const GUID* filterKey,
+        _Inout_ FWPS_FILTER3* filter
+    )
+    {
+        UNREFERENCED_PARAMETER(notifyType);
+        UNREFERENCED_PARAMETER(filterKey);
+        UNREFERENCED_PARAMETER(filter);
+        return STATUS_SUCCESS;
+    }
+}
+
+namespace ToyDriver::Callouts::OutboundICMPError
+{
+    void ClassifyFn(
+        _In_ const FWPS_INCOMING_VALUES0* inFixedValues,
+        _In_ const FWPS_INCOMING_METADATA_VALUES0* inMetaValues,
+        _Inout_opt_ void* layerData,
+        _In_opt_ const void* classifyContext,
+        _In_ const FWPS_FILTER3* filter,
+        _In_ UINT64 flowContext,
+        _Inout_ FWPS_CLASSIFY_OUT0* classifyOut
+    )
+    {
+        UNREFERENCED_PARAMETER(inFixedValues);
+        UNREFERENCED_PARAMETER(inMetaValues);
+        UNREFERENCED_PARAMETER(layerData);
+        UNREFERENCED_PARAMETER(classifyContext);
+        UNREFERENCED_PARAMETER(filter);
+        UNREFERENCED_PARAMETER(flowContext);
+
+        // We only inspect traffic
+        classifyOut->actionType = FWP_ACTION_CONTINUE;
+
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__"(): ICMP outbound error detected\n"));
+    }
+
+    _Use_decl_annotations_
+        NTSTATUS NotifyFn(
+            FWPS_CALLOUT_NOTIFY_TYPE notifyType,
+            const GUID* filterKey,
+            FWPS_FILTER3* filter
+        )
+    {
+        UNREFERENCED_PARAMETER(notifyType);
+        UNREFERENCED_PARAMETER(filterKey);
+        UNREFERENCED_PARAMETER(filter);
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__ "(): invoked\n"));
+        return STATUS_SUCCESS;
+    }
 }
 
 namespace ToyDriver::Callouts::InboundICMPError
@@ -151,7 +249,7 @@ namespace ToyDriver::Callouts::InboundICMPError
         // We only inspect traffic
         classifyOut->actionType = FWP_ACTION_CONTINUE;
 
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__": ICMP error detected\n"));
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__": ICMP inbound error detected\n"));
     }
 
     _Use_decl_annotations_

@@ -28,9 +28,6 @@
     <ClInclude Include="include\Util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Identifiers.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Globals.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

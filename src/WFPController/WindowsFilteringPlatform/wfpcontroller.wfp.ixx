@@ -26,6 +26,8 @@ export namespace WFPController::WFP
 			virtual void AddOutboundTCPPacketCallout();
 			virtual void AddOutboundIPv4PacketCallout();
 			virtual void AddInboundIPv4PacketCallout();
+			virtual void AddInboundICMPErrorCallout();
+			virtual void AddOutboundICMPErrorCallout();
 			virtual void AddSublayer();
 			virtual void AddFilters();
 
@@ -47,18 +49,19 @@ export namespace WFPController::WFP
 			std::wstring m_sublayerName;
 			std::wstring m_sublayerDescription;
 
-			UINT64 m_filterId;
-			std::wstring m_filterName;
+			// Need to split these out into object; too confusing to track everything here
+			UINT64 m_outboundIPv4FilterID;
+			std::wstring m_outboundIPv4FilterName;
 
-			UINT64 m_filterId2;
-			std::wstring m_filterName2;
+			UINT64 m_inboundICMPErrorFilterID;
+			std::wstring m_inboundICMPErrorFilterName;
+
+			UINT64 m_outboundICMPErrorFilterID;
+			std::wstring m_outboundICMPErrorFilterName;
 
 			Callout m_outboundIPv4Callout;
-			//std::wstring m_calloutName;
-			//unsigned m_calloutId;
-
-			//std::wstring m_calloutName2;
-			//unsigned m_calloutId2;
+			Callout m_inboundICMPErrorCallout;
+			Callout m_outboundICMPErrorCallout;
 
 			UINT64 m_contextId;
 	};

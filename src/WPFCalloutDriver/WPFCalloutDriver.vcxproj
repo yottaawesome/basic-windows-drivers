@@ -44,7 +44,6 @@
     <ClInclude Include="include\Driver.hpp" />
     <ClInclude Include="include\Globals.hpp" />
     <ClInclude Include="include\Headers.hpp" />
-    <ClInclude Include="include\Identifiers.hpp" />
     <ClInclude Include="include\Util.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
