@@ -3,6 +3,6 @@
 
 namespace ToyDriver::Globals
 {
-	static WDFDEVICE WDFDriverDevice = { 0 };
-	static PDEVICE_OBJECT DriverDeviceObject = nullptr;
+	extern WDFDEVICE WDFDriverDevice;
+	extern PDEVICE_OBJECT DriverDeviceObject;
 }

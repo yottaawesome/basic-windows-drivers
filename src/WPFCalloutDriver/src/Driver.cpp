@@ -9,6 +9,9 @@
 
 extern "C" PULONG InitSafeBootMode;
 
+WDFDEVICE ToyDriver::Globals::WDFDriverDevice = { 0 };
+PDEVICE_OBJECT ToyDriver::Globals::DriverDeviceObject = nullptr;
+
 _Use_decl_annotations_
 NTSTATUS DriverEntry(
     PDRIVER_OBJECT  DriverObject,
@@ -101,7 +104,7 @@ NTSTATUS DriverEntry(
         }
 
         // Register our callouts
-        if(status = ToyDriver::Callouts::RegisterCallouts(); NT_ERROR(status))
+        if(status = ToyDriver::Callouts::RegisterAllCallouts(); NT_ERROR(status))
         {
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "RegisterCallouts() failed %lu\n", status));
             break;
@@ -124,5 +127,5 @@ _Use_decl_annotations_
 void DriverUnload(WDFDRIVER DriverObject)
 {
     UNREFERENCED_PARAMETER(DriverObject);
-    ToyDriver::Callouts::UnregisterCallouts();
+    ToyDriver::Callouts::UnregisterAllCallouts();
 }
