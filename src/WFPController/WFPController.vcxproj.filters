@@ -78,5 +78,11 @@
     <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.wfperror.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.filter.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

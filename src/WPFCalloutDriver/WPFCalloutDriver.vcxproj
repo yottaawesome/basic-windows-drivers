@@ -35,10 +35,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Callouts.cpp" />
     <ClCompile Include="src\Driver.cpp" />
+    <ClCompile Include="src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Callouts.hpp" />
     <ClInclude Include="include\Driver.hpp" />
+    <ClInclude Include="include\Globals.hpp" />
+    <ClInclude Include="include\Headers.hpp" />
+    <ClInclude Include="include\Identifiers.hpp" />
+    <ClInclude Include="include\Util.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F3FC1923-0184-4860-8661-F30D836AFB6A}</ProjectGuid>

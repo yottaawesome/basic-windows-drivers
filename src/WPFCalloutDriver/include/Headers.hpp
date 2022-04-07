@@ -1,0 +1,13 @@
+#pragma once
+#pragma warning(disable:4201)
+#pragma warning(disable:4471)
+#include <ntddk.h>
+#include <wdf.h>
+#include <initguid.h>
+#include <Wdmsec.h>
+#include <guiddef.h>
+#include <ndis.h>
+#include <Fwpsk.h>
+#include <fwpmtypes.h>
+#include <fwptypes.h>
+#include <fwpmk.h>

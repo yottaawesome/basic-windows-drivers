@@ -107,50 +107,14 @@ namespace WFPController::WFP
 			Identifiers::WFP_PROVIDER_GUID,
 			FWPM_LAYER_OUTBOUND_IPPACKET_V4,
 			FWPM_CALLOUT_FLAG_USES_PROVIDER_CONTEXT,
-			L"callout1"
+			L"Outbound IPv4 Callout"
 		);
 		m_outboundIPv4Callout.Add();
-
-		//if (!m_engineHandle)
-		//	throw std::invalid_argument(__FUNCSIG__": engineHandle");
-
-		//// https://docs.microsoft.com/en-us/windows/win32/api/fwpmtypes/ns-fwpmtypes-fwpm_callout0
-		//FWPM_CALLOUT0 m_outboundIPv4Callout = {
-		//	.calloutKey = Identifiers::WFP_OUTBOUND_IPV4_CALLOUT_GUID,
-		//	.displayData = {.name = m_calloutName.data() },
-		//	.flags = FWPM_CALLOUT_FLAG_USES_PROVIDER_CONTEXT,
-		//	.providerKey = (GUID*)&Identifiers::WFP_PROVIDER_GUID,
-		//	.applicableLayer = FWPM_LAYER_OUTBOUND_IPPACKET_V4,
-		//};
-		//const DWORD status = FwpmCalloutAdd0(
-		//	m_engineHandle,
-		//	&m_outboundIPv4Callout,
-		//	nullptr,         // default security desc
-		//	&m_calloutId
-		//);
-		//if (status != ERROR_SUCCESS)
-		//	throw std::runtime_error(std::format("Failed to add callout 1 {}", status));
 	}
 
 	void WFPEngine::AddInboundIPv4PacketCallout()
 	{
-		//if (!m_engineHandle)
-		//	throw std::invalid_argument(__FUNCSIG__": engineHandle");
 
-		//FWPM_CALLOUT0 mCallout2 = {
-		//	.calloutKey = Identifiers::WFP_INBOUND_IPV4_CALLOUT_GUID,
-		//	.displayData = {.name = m_calloutName2.data() },
-		//	.providerKey = (GUID*)&Identifiers::WFP_PROVIDER_GUID,
-		//	.applicableLayer = FWPM_LAYER_INBOUND_IPPACKET_V4,
-		//};
-		//const DWORD status = FwpmCalloutAdd0(
-		//	m_engineHandle,
-		//	&mCallout2,
-		//	nullptr,         // default security desc
-		//	&m_calloutId2
-		//);
-		//if (status != ERROR_SUCCESS)
-		//	throw std::runtime_error(std::format("Failed to add callout 2 {}", status));
 	}
 
 	void WFPEngine::AddCallouts()

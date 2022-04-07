@@ -154,6 +154,8 @@
     <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.callout.cpp" />
     <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.callout.ixx" />
     <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.cpp" />
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.filter.cpp" />
+    <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.filter.ixx" />
     <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.ixx" />
     <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.wfperror.cpp" />
     <ClCompile Include="WindowsFilteringPlatform\wfpcontroller.wfp.wfperror.ixx" />

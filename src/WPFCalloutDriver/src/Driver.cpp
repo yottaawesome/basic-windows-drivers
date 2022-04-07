@@ -1,206 +1,13 @@
 #include "driver.hpp"
+#include "Globals.hpp"
+#include "Identifiers.hpp"
+#include "Callouts.hpp"
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text (INIT, DriverEntry)
 #endif
 
 extern "C" PULONG InitSafeBootMode;
-
-WDFDEVICE g_wdfDevice;
-PDEVICE_OBJECT g_deviceObject;
-
-void LogFilter(const FWPS_FILTER3* filter)
-{
-    if (!filter)
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "filter is null\n"));
-        return;
-    }
-    if (!filter->providerContext)
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "providerContext is null\n"));
-        return;
-    }
-    if (!filter->providerContext->dataBuffer)
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "dataBuffer is null\n"));
-        return;
-    }
-    if (!filter->providerContext->dataBuffer->size)
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "dataBuffer is empty\n"));
-        return;
-    }
-
-    // filter->providerContext->providerData is always null, not matter what I pass for the
-    // providerData at the filter, callout, or provider object creation stages. The MSDN
-    // docs don't really provide any useful information as to why, and the only tangible
-    // sources online refer only to filter->providerContext->dataBuffer instead.
-}
-
-DWORD GetProcessId(const FWPS_FILTER3* filter)
-{
-    if (!filter) 
-        return 0;
-    if (!filter->providerContext) 
-        return 0;
-    if (!filter->providerContext->dataBuffer) 
-        return 0;
-    if (!filter->providerContext->dataBuffer->size) 
-        return 0;
-
-    if (filter->providerContext->dataBuffer->size != sizeof(DWORD))
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "GetProcessId(): data size mismatch\n"));
-        return 0;
-    }
-
-    return *reinterpret_cast<DWORD*>(filter->providerContext->dataBuffer->data);
-}
-
-_Use_decl_annotations_
-void ClassifyFn(
-    const FWPS_INCOMING_VALUES0* inFixedValues,
-    const FWPS_INCOMING_METADATA_VALUES0* inMetaValues,
-    void* layerData,
-    const void* classifyContext,
-    const FWPS_FILTER3* filter,
-    UINT64 flowContext,
-    FWPS_CLASSIFY_OUT0* classifyOut
-)
-{
-    UNREFERENCED_PARAMETER(inMetaValues);
-    UNREFERENCED_PARAMETER(layerData);
-    UNREFERENCED_PARAMETER(classifyContext);
-    UNREFERENCED_PARAMETER(flowContext);
-
-    // We only inspect traffic
-    classifyOut->actionType = FWP_ACTION_CONTINUE;
-
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/fwpsk/ns-fwpsk-fwps_incoming_metadata_values0_
-    // Not available at the IPV* layers: inMetaValues->packetDirection == FWP_DIRECTION_INBOUND
-    switch (inFixedValues->layerId)
-    {
-        case FWPS_LAYER_INBOUND_IPPACKET_V4:
-            //KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> inbound IPv4 packet\n"));
-            break;
-
-        case FWPS_LAYER_OUTBOUND_IPPACKET_V4:
-        {
-            // https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/8c923f6b-ce7d-4246-a919-2424d6e1991f/process-id-from-fwpmlayeroutboundippacketv4-layer
-            // Note that processId is not available at IPV* layers: https://docs.microsoft.com/en-us/windows-hardware/drivers/network/metadata-fields-at-each-filtering-layer
-            // inMetaValues->currentMetadataValues & FWPS_METADATA_FIELD_PROCESS_ID)
-            const size_t runningProcessId = reinterpret_cast<size_t>(PsGetCurrentProcessId());
-            const DWORD processId = GetProcessId(filter);
-            if (!processId || !runningProcessId || processId != runningProcessId)
-                return;
-
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> outbound IPv4 packet\n"));
-            break;
-        }
-            
-
-        case FWPS_LAYER_INBOUND_TRANSPORT_V4:
-            //KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> inbound TCP\n"));
-            break;
-
-        case FWPS_LAYER_OUTBOUND_TRANSPORT_V4:
-            //KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "ClassifyFn() matched process --> outbound TCP\n"));
-            break;
-
-        default:
-            break;
-    }
-}
-
-_Use_decl_annotations_
-NTSTATUS NotifyFn(
-    FWPS_CALLOUT_NOTIFY_TYPE notifyType, 
-    const GUID* filterKey, 
-    FWPS_FILTER3* filter
-)
-{
-    UNREFERENCED_PARAMETER(notifyType);
-    UNREFERENCED_PARAMETER(filterKey);
-    UNREFERENCED_PARAMETER(filter);
-    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "NotifyFn()\n"));
-    return STATUS_SUCCESS;
-}
-
-NTSTATUS RegisterCallout(
-    GUID  calloutKey,
-    FWPS_CALLOUT_CLASSIFY_FN3 classifyCallout,
-    FWPS_CALLOUT_NOTIFY_FN3 notifyCallout
-)
-{
-    if (!g_deviceObject)
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "RegisterCallouts(): g_deviceObject is nullptr\n"));
-        return STATUS_INVALID_HANDLE;
-    }
-
-    UINT32 calloutId = 0;
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/fwpsk/ns-fwpsk-fwps_callout2_
-    // FWPS_CALLOUT3 doesn't appear to be documented, only 0-2 are
-    FWPS_CALLOUT3 sCallout
-    {
-        .calloutKey = calloutKey,
-        .classifyFn = classifyCallout,
-        .notifyFn = notifyCallout
-    };
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/fwpsk/nf-fwpsk-fwpscalloutregister0
-    // This should actually be FwpsCalloutRegister3, but it's not documented
-    NTSTATUS status = FwpsCalloutRegister3(
-        g_deviceObject,
-        &sCallout,
-        &calloutId
-    );
-    if (NT_ERROR(status))
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "FwpsCalloutRegister3() failed %lu\n", status));
-        return status;
-    }
-
-    return status;
-}
-
-NTSTATUS RegisterCallouts()
-{
-    NTSTATUS status = RegisterCallout(
-        WFP_OUTBOUND_IPV4_CALLOUT_GUID,
-        ClassifyFn,
-        NotifyFn
-    );
-    if (NT_ERROR(status))
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Registering WFP_OUTBOUND_IPV4_CALLOUT_GUID failed %lu\n", status));
-        return status;
-    }
-
-    status = RegisterCallout(
-        WFP_INBOUND_IPV4_CALLOUT_GUID,
-        ClassifyFn,
-        NotifyFn
-    );
-    if (NT_ERROR(status))
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Registering WFP_INBOUND_IPV4_CALLOUT_GUID failed %lu\n", status));
-        return status;
-    }
-
-    status = RegisterCallout(
-        WFP_OUTBOUND_TCP_GUID,
-        ClassifyFn,
-        NotifyFn
-    );
-    if (NT_ERROR(status))
-    {
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Registering WFP_OUTBOUND_TCP_GUID failed %lu\n", status));
-        return status;
-    }
-
-    return status;
-}
 
 NTSTATUS DriverEntry(
     _In_ PDRIVER_OBJECT  DriverObject,
@@ -295,7 +102,7 @@ NTSTATUS DriverEntry(
         }
 
         // Register our callouts
-        if(status = RegisterCallouts(); NT_ERROR(status))
+        if(status = ToyDriver::Callouts::RegisterCallouts(); NT_ERROR(status))
         {
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "RegisterCallouts() failed %lu\n", status));
             break;
@@ -317,7 +124,8 @@ NTSTATUS DriverEntry(
 void DriverUnload(_In_ WDFDRIVER DriverObject)
 {
     UNREFERENCED_PARAMETER(DriverObject);
-    if (const NTSTATUS status = FwpsCalloutUnregisterByKey0(&WFP_OUTBOUND_IPV4_CALLOUT_GUID); status == STATUS_SUCCESS)
+    if (const NTSTATUS status = FwpsCalloutUnregisterByKey0(&ToyDriver::Identifiers::WFP_OUTBOUND_IPV4_CALLOUT_GUID); 
+        status == STATUS_SUCCESS)
         KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WFP driver shutdown successfully\n"));
     else
         KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WFP failed driver shutdown %lu\n", status));
