@@ -1,5 +1,8 @@
 #pragma once
 #include "Headers.hpp"
 
-static WDFDEVICE g_wdfDevice;
-static PDEVICE_OBJECT g_deviceObject;
+namespace ToyDriver::Globals
+{
+	static WDFDEVICE WDFDriverDevice = { 0 };
+	static PDEVICE_OBJECT DriverDeviceObject = nullptr;
+}

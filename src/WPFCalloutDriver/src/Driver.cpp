@@ -9,9 +9,10 @@
 
 extern "C" PULONG InitSafeBootMode;
 
+_Use_decl_annotations_
 NTSTATUS DriverEntry(
-    _In_ PDRIVER_OBJECT  DriverObject,
-    _In_ PUNICODE_STRING RegistryPath
+    PDRIVER_OBJECT  DriverObject,
+    PUNICODE_STRING RegistryPath
 )
 {
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/determining-whether-the-operating-system-is-running-in-safe-mode
@@ -22,9 +23,6 @@ NTSTATUS DriverEntry(
     PWDFDEVICE_INIT deviceInit = nullptr;
     do
     {
-        FWPM_SESSION0   session = { 0 };
-        FWPM_PROVIDER0  provider = { 0 };
-
         // See https://docs.microsoft.com/en-us/windows-hardware/drivers/network/specifying-an-unload-function
 
         // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nf-wdfdriver-wdf_driver_config_init
@@ -82,7 +80,7 @@ NTSTATUS DriverEntry(
 
         // Create a framework device object
         // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdevicecreate
-        if (status = WdfDeviceCreate(&deviceInit, WDF_NO_OBJECT_ATTRIBUTES, &g_wdfDevice); NT_ERROR(status))
+        if (status = WdfDeviceCreate(&deviceInit, WDF_NO_OBJECT_ATTRIBUTES, &ToyDriver::Globals::WDFDriverDevice); NT_ERROR(status))
         {
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceCreate() failed %lu\n", status));
             break;
@@ -91,11 +89,12 @@ NTSTATUS DriverEntry(
         // Initialization of the framework device object is complete
         // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfcontrol/nf-wdfcontrol-wdfcontrolfinishinitializing
         KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfControlFinishInitializing()\n"));
-        WdfControlFinishInitializing(g_wdfDevice);
+        WdfControlFinishInitializing(ToyDriver::Globals::WDFDriverDevice);
 
         // Get the associated WDM device object
         // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdevicewdmgetdeviceobject
-        if (g_deviceObject = WdfDeviceWdmGetDeviceObject(g_wdfDevice); !g_deviceObject)
+        if (ToyDriver::Globals::DriverDeviceObject = WdfDeviceWdmGetDeviceObject(ToyDriver::Globals::WDFDriverDevice); 
+            !ToyDriver::Globals::DriverDeviceObject)
         {
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WdfDeviceWdmGetDeviceObject() failed %lu\n", status));
             break;
@@ -120,13 +119,10 @@ NTSTATUS DriverEntry(
     return status;
 }
 
-//void DriverUnload(_In_ PDRIVER_OBJECT DriverObject)
-void DriverUnload(_In_ WDFDRIVER DriverObject)
+// Legacy driver signature = void DriverUnload(_In_ PDRIVER_OBJECT DriverObject)
+_Use_decl_annotations_
+void DriverUnload(WDFDRIVER DriverObject)
 {
     UNREFERENCED_PARAMETER(DriverObject);
-    if (const NTSTATUS status = FwpsCalloutUnregisterByKey0(&ToyDriver::Identifiers::WFP_OUTBOUND_IPV4_CALLOUT_GUID); 
-        status == STATUS_SUCCESS)
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WFP driver shutdown successfully\n"));
-    else
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "WFP failed driver shutdown %lu\n", status));
+    ToyDriver::Callouts::UnregisterCallouts();
 }
