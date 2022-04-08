@@ -6,24 +6,21 @@ namespace ToyDriver::Callouts
 {
     NTSTATUS UnregisterAllCallouts()
     {
-        NTSTATUS status = FwpsCalloutUnregisterByKey0(
-            &OutboundIPv4::Key
-        );
+        NTSTATUS status = FwpsCalloutUnregisterByKey0(&OutboundIPv4::Key);
         if (NT_ERROR(status))
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering OutboundIPv4: %lu\n", status));
 
-        status = FwpsCalloutUnregisterByKey0(
-            &InboundICMPError::Key
-        );
+        status = FwpsCalloutUnregisterByKey0(&InboundICMPError::Key);
         if (NT_ERROR(status))
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering InboundICMPError: %lu\n", status));
 
-        status = FwpsCalloutUnregisterByKey0(
-            &OutboundICMPError::Key
-        );
+        status = FwpsCalloutUnregisterByKey0(&OutboundICMPError::Key);
         if (NT_ERROR(status))
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering OutboundICMPError: %lu\n", status));
 
+        status = FwpsCalloutUnregisterByKey0(&OutboundTCP::Key);
+        if (NT_ERROR(status))
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering OutboundTCP: %lu\n", status));
 
         return STATUS_SUCCESS;
     }
@@ -136,6 +133,10 @@ namespace ToyDriver::Callouts::OutboundTCP
 
         // We only inspect traffic
         classifyOut->actionType = FWP_ACTION_CONTINUE;
+
+        const UINT16 localPort =
+            inFixedValues->incomingValue[FWPS_FIELD_OUTBOUND_TRANSPORT_V4_IP_LOCAL_PORT].value.uint16;
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__"(): outbound transport %hu\n", localPort));
     }
 
     NTSTATUS NotifyFn(
@@ -147,6 +148,9 @@ namespace ToyDriver::Callouts::OutboundTCP
         UNREFERENCED_PARAMETER(notifyType);
         UNREFERENCED_PARAMETER(filterKey);
         UNREFERENCED_PARAMETER(filter);
+        
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__"(): invoked\n"));
+
         return STATUS_SUCCESS;
     }
 }
@@ -188,6 +192,9 @@ namespace ToyDriver::Callouts::InboundIPv4
         UNREFERENCED_PARAMETER(notifyType);
         UNREFERENCED_PARAMETER(filterKey);
         UNREFERENCED_PARAMETER(filter);
+
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__"(): invoked\n"));
+        
         return STATUS_SUCCESS;
     }
 }
@@ -227,7 +234,9 @@ namespace ToyDriver::Callouts::OutboundICMPError
         UNREFERENCED_PARAMETER(notifyType);
         UNREFERENCED_PARAMETER(filterKey);
         UNREFERENCED_PARAMETER(filter);
+        
         KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__ "(): invoked\n"));
+
         return STATUS_SUCCESS;
     }
 }
@@ -280,7 +289,9 @@ namespace ToyDriver::Callouts::InboundICMPError
         UNREFERENCED_PARAMETER(notifyType);
         UNREFERENCED_PARAMETER(filterKey);
         UNREFERENCED_PARAMETER(filter);
+        
         KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__ "(): invoked\n"));
+
         return STATUS_SUCCESS;
     }
 }
@@ -331,7 +342,9 @@ namespace ToyDriver::Callouts::OutboundIPv4
         UNREFERENCED_PARAMETER(notifyType);
         UNREFERENCED_PARAMETER(filterKey);
         UNREFERENCED_PARAMETER(filter);
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "OutboundIPv4NotifyFn()\n"));
+        
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__"(): invoked\n"));
+
         return STATUS_SUCCESS;
     }
 }
