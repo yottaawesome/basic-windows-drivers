@@ -34,7 +34,9 @@ namespace WFPController::WFP
 		m_sublayerDescription(L"Just a toy sublayer"),
 		m_contextId(0),
 		m_outboundICMPErrorFilterID(0),
-		m_outboundICMPErrorFilterName(L"Outbound ICMP error filter")
+		m_outboundICMPErrorFilterName(L"Outbound ICMP error filter"),
+		m_outboundTransportFilterID(0),
+		m_outboundTransportFilterName(L"Outbound transport filter")
 	{
 	}
 
@@ -72,6 +74,7 @@ namespace WFPController::WFP
 		m_outboundIPv4Callout.Remove();
 		m_inboundICMPErrorCallout.Remove();
 		m_outboundICMPErrorCallout.Remove();
+		m_outboundTCPCallout.Remove();
 		m_engineHandle = nullptr;
 	}
 
@@ -98,7 +101,15 @@ namespace WFPController::WFP
 
 	void WFPEngine::AddOutboundTCPPacketCallout()
 	{
-
+		m_outboundTCPCallout = Callout(
+			m_engineHandle,
+			Identifiers::OutboundTCPCalloutKey,
+			Identifiers::ProviderKey,
+			FWPM_LAYER_OUTBOUND_TRANSPORT_V4,
+			FWPM_CALLOUT_FLAG_USES_PROVIDER_CONTEXT,
+			L"Outbound TCP Callout"
+		);
+		m_outboundTCPCallout.Add();
 	}
 
 	void WFPEngine::AddOutboundIPv4PacketCallout()
@@ -243,6 +254,16 @@ namespace WFPController::WFP
 			FWP_EMPTY,
 			FWP_ACTION_CALLOUT_INSPECTION,
 			m_outboundICMPErrorFilterID
+		);
+
+		AddFilter(
+			m_outboundTransportFilterName,
+			FWPM_LAYER_OUTBOUND_TRANSPORT_V4,
+			Identifiers::SublayerKey,
+			Identifiers::OutboundTCPCalloutKey,
+			FWP_EMPTY,
+			FWP_ACTION_CALLOUT_INSPECTION,
+			m_outboundTransportFilterID
 		);
 	}
 

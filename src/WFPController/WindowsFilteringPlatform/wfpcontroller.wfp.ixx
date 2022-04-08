@@ -59,9 +59,13 @@ export namespace WFPController::WFP
 			UINT64 m_outboundICMPErrorFilterID;
 			std::wstring m_outboundICMPErrorFilterName;
 
+			UINT64 m_outboundTransportFilterID;
+			std::wstring m_outboundTransportFilterName;
+
 			Callout m_outboundIPv4Callout;
 			Callout m_inboundICMPErrorCallout;
 			Callout m_outboundICMPErrorCallout;
+			Callout m_outboundTCPCallout;
 
 			UINT64 m_contextId;
 	};

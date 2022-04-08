@@ -100,18 +100,16 @@ namespace ToyDriver::Callouts
             return status;
         }
 
-        // FWPS_LAYER_INBOUND_ICMP_ERROR_V4
-
-        /*status = RegisterCallout(
-            Identifiers::WFP_OUTBOUND_TCP_CALLOUT_GUID,
-            InboundIPv4ClassifyFn,
-            NotifyFn
+        status = RegisterCallout(
+            OutboundTCP::Key,
+            OutboundTCP::ClassifyFn,
+            OutboundTCP::NotifyFn
         );
         if (NT_ERROR(status))
         {
-            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Registering WFP_OUTBOUND_TCP_GUID failed %lu\n", status));
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Registering OutboundTCP failed %lu\n", status));
             return status;
-        }*/
+        }
 
         return status;
     }
@@ -262,10 +260,14 @@ namespace ToyDriver::Callouts::InboundICMPError
         //const size_t runningProcessId = reinterpret_cast<size_t>(PsGetCurrentProcessId());
         const UINT32 remoteIpAddress =
             inFixedValues->incomingValue[FWPS_FIELD_INBOUND_ICMP_ERROR_V4_IP_REMOTE_ADDRESS].value.uint32;
-        const UINT8 icmpType = inFixedValues->incomingValue[FWPS_FIELD_INBOUND_ICMP_ERROR_V4_ICMP_TYPE].value.uint8;
-        const UINT8 icmpCode = inFixedValues->incomingValue[FWPS_FIELD_INBOUND_ICMP_ERROR_V4_ICMP_CODE].value.uint8;
+        const UINT16 embeddedLocalPort = 
+            inFixedValues->incomingValue[FWPS_FIELD_INBOUND_ICMP_ERROR_V4_EMBEDDED_LOCAL_PORT].value.uint16;
+        const UINT8 icmpType = 
+            inFixedValues->incomingValue[FWPS_FIELD_INBOUND_ICMP_ERROR_V4_ICMP_TYPE].value.uint8;
+        const UINT8 icmpCode = 
+            inFixedValues->incomingValue[FWPS_FIELD_INBOUND_ICMP_ERROR_V4_ICMP_CODE].value.uint8;
 
-        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__": ICMP inbound error detected, remote address: %lu, type %hu, code %hu\n", remoteIpAddress, icmpType, icmpCode));
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__": ICMP inbound error detected, remote address %lu, embedded local port %hu type %hu, code %hu\n", remoteIpAddress, embeddedLocalPort, icmpType, icmpCode));
     }
 
     _Use_decl_annotations_
