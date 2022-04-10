@@ -24,9 +24,9 @@ Provisioned VMs require binaries to be signed, or they'll be blocked by Microsof
 * To list all breakpoints, use `bl`;
 * To list all running modules, use `lm`;
 * To list all symbols in a module, use `x <module>!<symbol-search-string>` e.g. `x KmdfHelloWorld!Driver*`
-* `bc` - clears a breakpoint from the list. Use bc * to clear all breakpoints.
-* `bd` - disables a breakpoint. Use bd * to disable all breakpoints.
-* `be` - enables a breakpoint. Use be * to enable all breakpoints.
+* `bc` - clears a breakpoint from the list. Use `bc *` to clear all breakpoints.
+* `bd` - disables a breakpoint. Use `bd *` to disable all breakpoints.
+* `be` - enables a breakpoint. Use `be *` to enable all breakpoints.
 
 See the [step-by-step lab](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debug-universal-drivers---step-by-step-lab--echo-kernel-mode-) for further information.
 
