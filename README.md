@@ -16,7 +16,7 @@ If you receive obscure errors related to inf2cat to dates in the `DriverVer` fie
 
 ## Deploying
 
-Provisioned VMs require binaries to be signed, or they'll be blocked by Microsoft Defender. As part of the VM provisioning process, development certificates for signing drivers will be generated. The `SignTool` comes with the Windows Kit (e.g. under `C:\Program Files (x86)\Windows Kits\10\App Certification Kit\`) and can be used like so to sign a binary: `SignTool.exe Sign -A -V <binary_path>.
+Provisioned VMs require binaries to be signed, or they'll be blocked by Microsoft Defender. As part of the VM provisioning process, development certificates for signing drivers will be generated. The `SignTool` comes with the Windows Kit (e.g. under `C:\Program Files (x86)\Windows Kits\10\App Certification Kit\`) and can be used like so to sign a binary: `SignTool.exe Sign -A -V <binary_path>`.
 
 ## WinDbg
 
