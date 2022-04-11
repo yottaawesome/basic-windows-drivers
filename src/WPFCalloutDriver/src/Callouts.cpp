@@ -6,21 +6,25 @@ namespace ToyDriver::Callouts
 {
     NTSTATUS UnregisterAllCallouts()
     {
-        NTSTATUS status = FwpsCalloutUnregisterByKey0(&OutboundIPv4::Key);
+        NTSTATUS status = FwpsCalloutUnregisterByKey0(&Outbound::IPv4::Key);
         if (NT_ERROR(status))
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering OutboundIPv4: %lu\n", status));
 
-        status = FwpsCalloutUnregisterByKey0(&InboundICMPError::Key);
+        status = FwpsCalloutUnregisterByKey0(&Inbound::ICMPError::Key);
         if (NT_ERROR(status))
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering InboundICMPError: %lu\n", status));
 
-        status = FwpsCalloutUnregisterByKey0(&OutboundICMPError::Key);
+        status = FwpsCalloutUnregisterByKey0(&Outbound::ICMPError::Key);
         if (NT_ERROR(status))
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering OutboundICMPError: %lu\n", status));
 
-        status = FwpsCalloutUnregisterByKey0(&OutboundTCP::Key);
+        status = FwpsCalloutUnregisterByKey0(&Outbound::TCP::Key);
         if (NT_ERROR(status))
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering OutboundTCP: %lu\n", status));
+
+        status = FwpsCalloutUnregisterByKey0(&Inbound::TCP::Key);
+        if (NT_ERROR(status))
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Failed unregistering InboundTCP: %lu\n", status));
 
         return STATUS_SUCCESS;
     }
@@ -65,9 +69,9 @@ namespace ToyDriver::Callouts
     NTSTATUS RegisterAllCallouts()
     {
         NTSTATUS status = RegisterCallout(
-            OutboundIPv4::Key,
-            OutboundIPv4::ClassifyFn,
-            OutboundIPv4::NotifyFn
+            Outbound::IPv4::Key,
+            Outbound::IPv4::ClassifyFn,
+            Outbound::IPv4::NotifyFn
         );
         if (NT_ERROR(status))
         {
@@ -76,9 +80,9 @@ namespace ToyDriver::Callouts
         }
 
         status = RegisterCallout(
-            InboundICMPError::Key,
-            InboundICMPError::ClassifyFn,
-            InboundICMPError::NotifyFn
+            Inbound::ICMPError::Key,
+            Inbound::ICMPError::ClassifyFn,
+            Inbound::ICMPError::NotifyFn
         );
         if (NT_ERROR(status))
         {
@@ -87,9 +91,9 @@ namespace ToyDriver::Callouts
         }
 
         status = RegisterCallout(
-            OutboundICMPError::Key,
-            OutboundICMPError::ClassifyFn,
-            OutboundICMPError::NotifyFn
+            Outbound::ICMPError::Key,
+            Outbound::ICMPError::ClassifyFn,
+            Outbound::ICMPError::NotifyFn
         );
         if (NT_ERROR(status))
         {
@@ -98,9 +102,9 @@ namespace ToyDriver::Callouts
         }
 
         status = RegisterCallout(
-            OutboundTCP::Key,
-            OutboundTCP::ClassifyFn,
-            OutboundTCP::NotifyFn
+            Outbound::TCP::Key,
+            Outbound::TCP::ClassifyFn,
+            Outbound::TCP::NotifyFn
         );
         if (NT_ERROR(status))
         {
@@ -108,11 +112,65 @@ namespace ToyDriver::Callouts
             return status;
         }
 
+        status = RegisterCallout(
+            Inbound::TCP::Key,
+            Inbound::TCP::ClassifyFn,
+            Inbound::TCP::NotifyFn
+        );
+        if (NT_ERROR(status))
+        {
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Registering InboundTCP failed %lu\n", status));
+            return status;
+        }
+
         return status;
     }
 }
 
-namespace ToyDriver::Callouts::OutboundTCP
+namespace ToyDriver::Callouts::Inbound::TCP
+{
+    void ClassifyFn(
+        _In_ const FWPS_INCOMING_VALUES0* inFixedValues,
+        _In_ const FWPS_INCOMING_METADATA_VALUES0* inMetaValues,
+        _Inout_opt_ void* layerData,
+        _In_opt_ const void* classifyContext,
+        _In_ const FWPS_FILTER3* filter,
+        _In_ UINT64 flowContext,
+        _Inout_ FWPS_CLASSIFY_OUT0* classifyOut
+    )
+    {
+        UNREFERENCED_PARAMETER(inFixedValues);
+        UNREFERENCED_PARAMETER(inMetaValues);
+        UNREFERENCED_PARAMETER(layerData);
+        UNREFERENCED_PARAMETER(classifyContext);
+        UNREFERENCED_PARAMETER(filter);
+        UNREFERENCED_PARAMETER(flowContext);
+
+        // We only inspect traffic
+        classifyOut->actionType = FWP_ACTION_CONTINUE;
+
+        const UINT16 localPort =
+            inFixedValues->incomingValue[FWPS_FIELD_INBOUND_TRANSPORT_V4_IP_LOCAL_PORT].value.uint16;
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__"(): inbound transport %hu\n", localPort));
+    }
+
+    NTSTATUS NotifyFn(
+        _In_ FWPS_CALLOUT_NOTIFY_TYPE notifyType,
+        _In_ const GUID* filterKey,
+        _Inout_ FWPS_FILTER3* filter
+    )
+    {
+        UNREFERENCED_PARAMETER(notifyType);
+        UNREFERENCED_PARAMETER(filterKey);
+        UNREFERENCED_PARAMETER(filter);
+
+        KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__"(): invoked\n"));
+
+        return STATUS_SUCCESS;
+    }
+}
+
+namespace ToyDriver::Callouts::Outbound::TCP
 {
     void ClassifyFn(
         _In_ const FWPS_INCOMING_VALUES0* inFixedValues,
@@ -155,7 +213,7 @@ namespace ToyDriver::Callouts::OutboundTCP
     }
 }
 
-namespace ToyDriver::Callouts::InboundIPv4
+namespace ToyDriver::Callouts::Inbound::IPv4
 {
     _Use_decl_annotations_
     void ClassifyFn(
@@ -199,7 +257,7 @@ namespace ToyDriver::Callouts::InboundIPv4
     }
 }
 
-namespace ToyDriver::Callouts::OutboundICMPError
+namespace ToyDriver::Callouts::Outbound::ICMPError
 {
     void ClassifyFn(
         _In_ const FWPS_INCOMING_VALUES0* inFixedValues,
@@ -241,7 +299,7 @@ namespace ToyDriver::Callouts::OutboundICMPError
     }
 }
 
-namespace ToyDriver::Callouts::InboundICMPError
+namespace ToyDriver::Callouts::Inbound::ICMPError
 {
     void ClassifyFn(
         _In_ const FWPS_INCOMING_VALUES0* inFixedValues,
@@ -296,7 +354,7 @@ namespace ToyDriver::Callouts::InboundICMPError
     }
 }
 
-namespace ToyDriver::Callouts::OutboundIPv4
+namespace ToyDriver::Callouts::Outbound::IPv4
 {
     _Use_decl_annotations_
     void ClassifyFn(
