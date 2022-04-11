@@ -3,6 +3,7 @@ module;
 #include <stdexcept>
 #include <iostream>
 #include <memory>
+#include <vector>
 #include <string>
 #include <format>
 #include <source_location>
@@ -233,6 +234,7 @@ namespace WFPController::WFP
 			Identifiers::OutboundIPv4CalloutKey,
 			FWP_EMPTY,
 			FWP_ACTION_CALLOUT_INSPECTION,
+			{},
 			m_outboundIPv4FilterID
 		);
 
@@ -243,6 +245,7 @@ namespace WFPController::WFP
 			Identifiers::InboundICMPErrorCalloutKey,
 			FWP_EMPTY,
 			FWP_ACTION_CALLOUT_INSPECTION,
+			{},
 			m_inboundICMPErrorFilterID
 		);
 
@@ -253,9 +256,20 @@ namespace WFPController::WFP
 			Identifiers::OutboundICMPErrorCalloutKey,
 			FWP_EMPTY,
 			FWP_ACTION_CALLOUT_INSPECTION,
+			{},
 			m_outboundICMPErrorFilterID
 		);
 
+		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmtypes/ns-fwpmtypes-fwpm_filter_condition0
+		std::vector<FWPM_FILTER_CONDITION0> conditions;
+		conditions.push_back({
+			.fieldKey = FWPM_CONDITION_IP_PROTOCOL,
+			.matchType = FWP_MATCH_EQUAL,
+			.conditionValue = {
+				.type = FWP_UINT8,
+				.uint8 = 6// IPPROTO_TCP
+			}
+		});
 		AddFilter(
 			m_outboundTransportFilterName,
 			FWPM_LAYER_OUTBOUND_TRANSPORT_V4,
@@ -263,6 +277,7 @@ namespace WFPController::WFP
 			Identifiers::OutboundTCPCalloutKey,
 			FWP_EMPTY,
 			FWP_ACTION_CALLOUT_INSPECTION,
+			conditions,
 			m_outboundTransportFilterID
 		);
 	}
@@ -274,14 +289,13 @@ namespace WFPController::WFP
 		const GUID& calloutKey,
 		const FWP_DATA_TYPE weightType,
 		const FWP_ACTION_TYPE actionType,
+		const std::vector<FWPM_FILTER_CONDITION0>& conditions,
 		UINT64& filterId
 	)
 	{
 		if (!m_engineHandle)
 			throw std::invalid_argument(__FUNCSIG__": engineHandle");
-		
-		DWORD data = 777;
-
+		;
 		// https://docs.microsoft.com/en-us/windows/win32/api/fwpmtypes/ns-fwpmtypes-fwpm_filter0
 		const FWPM_FILTER0 filter
 		{
@@ -290,16 +304,13 @@ namespace WFPController::WFP
 			},
 			.flags = FWPM_FILTER_FLAG_HAS_PROVIDER_CONTEXT,
 			.providerKey = (GUID*)&Identifiers::ProviderKey,
-			.providerData = {
-				.size = sizeof(data),
-				.data = reinterpret_cast<UINT8*>(&data)
-			},
 			.layerKey = layerKey,
 			.subLayerKey = sublayerGuid,
 			.weight {
 				.type = weightType
 			},
-			.numFilterConditions = 0,   // this applies to all application traffic
+			.numFilterConditions = (UINT32)conditions.size(),   // this applies to all application traffic when 0
+			.filterCondition = conditions.empty() ? nullptr : const_cast<FWPM_FILTER_CONDITION0*>(&conditions[0]),
 			.action = {
 				.type = actionType,
 				.calloutKey = calloutKey

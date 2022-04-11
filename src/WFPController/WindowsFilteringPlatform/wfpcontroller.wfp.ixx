@@ -1,6 +1,7 @@
 module;
 
 #include <string>
+#include <vector>
 #include <memory>
 #include <format>
 #include <Windows.h>
@@ -39,6 +40,7 @@ export namespace WFPController::WFP
 				const GUID& calloutKey,
 				const FWP_DATA_TYPE weightType,
 				const FWP_ACTION_TYPE actionType,
+				const std::vector<FWPM_FILTER_CONDITION0>& conditions,
 				UINT64& filterId
 			);
 
