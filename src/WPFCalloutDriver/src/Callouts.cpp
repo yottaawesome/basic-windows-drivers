@@ -4,6 +4,8 @@
 
 namespace ToyDriver::Callouts
 {
+    UINT16 matchedPort = 0;
+
     NTSTATUS UnregisterAllCallouts()
     {
         NTSTATUS status = FwpsCalloutUnregisterByKey0(&Outbound::IPv4::Key);
@@ -151,6 +153,8 @@ namespace ToyDriver::Callouts::Inbound::TCP
 
         const UINT16 localPort =
             inFixedValues->incomingValue[FWPS_FIELD_INBOUND_TRANSPORT_V4_IP_LOCAL_PORT].value.uint16;
+        if (matchedPort && localPort && localPort == matchedPort)
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__"(): matched on port %hu\n", localPort));
         KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__"(): inbound transport %hu\n", localPort));
     }
 
@@ -192,8 +196,14 @@ namespace ToyDriver::Callouts::Outbound::TCP
         // We only inspect traffic
         classifyOut->actionType = FWP_ACTION_CONTINUE;
 
+        const size_t runningProcessId = reinterpret_cast<size_t>(PsGetCurrentProcessId());
+        const DWORD processId = Util::GetProcessId(filter);
+        if (!processId || !runningProcessId || processId != runningProcessId)
+            return;
+
         const UINT16 localPort =
             inFixedValues->incomingValue[FWPS_FIELD_OUTBOUND_TRANSPORT_V4_IP_LOCAL_PORT].value.uint16;
+        matchedPort = localPort;
         KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, __FUNCTION__"(): outbound transport %hu\n", localPort));
     }
 
