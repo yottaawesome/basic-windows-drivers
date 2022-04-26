@@ -118,6 +118,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <IntDir>$(Platform)\$(ConfigurationName)\$(ProjectName)\</IntDir>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
@@ -162,7 +163,15 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SampleWdmDriver.cpp" />
+    <ClCompile Include="src\ScopedSpinLock.cpp" />
+    <ClCompile Include="src\SpinLock.cpp" />
+    <ClCompile Include="src\Operators.cpp" />
+    <ClCompile Include="src\DriverMain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Operators.hpp" />
+    <ClInclude Include="include\ScopedSpinLock.hpp" />
+    <ClInclude Include="include\SpinLock.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
