@@ -41,3 +41,8 @@ You can WinDbg and attach to the provisioned machine to see some basic debugging
 * [Using WDF to develop a driver](https://docs.microsoft.com/en-us/windows-hardware/drivers/wdf/using-the-framework-to-develop-a-driver)
 * [Developing Drivers with the Windows Driver Foundation](https://docs.microsoft.com/en-us/windows-hardware/drivers/wdf/developing-drivers-with-wdf)
 * [Packet Inspection Points](https://docs.microsoft.com/en-us/windows-hardware/drivers/network/packet-inspection-points)
+* [Metadata fields at each layer](https://docs.microsoft.com/en-us/windows-hardware/drivers/network/metadata-fields-at-each-filtering-layer)
+* [Filtering conditions at each layer](https://docs.microsoft.com/en-us/windows-hardware/drivers/network/filtering-conditions-available-at-each-filtering-layer)
+* [TCP packet flows](https://docs.microsoft.com/en-us/windows/win32/fwp/tcp-packet-flows)
+* [Data field identifiers](https://docs.microsoft.com/en-us/windows-hardware/drivers/network/data-field-identifiers)
+* [Data offset positions](https://docs.microsoft.com/en-us/windows-hardware/drivers/network/data-offset-positions)
