@@ -9,7 +9,7 @@ constexpr unsigned long DriverPoolTag = 'dcba';
 
 void* operator new(size_t n, const POOL_TYPE poolType) noexcept(false)
 {
-    return ExAllocatePoolWithTag(poolType, n, DriverPoolTag);
+    return ExAllocatePool2(poolType, n, DriverPoolTag);
 }
 
 void operator delete(void* p) noexcept(true)
