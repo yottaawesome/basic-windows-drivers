@@ -33,6 +33,7 @@ See the [step-by-step lab](https://docs.microsoft.com/en-us/windows-hardware/dri
 * If devcon.exe fails, a log is generated at `c:\windows\inf\setupapi.dev.log`.
 * If you get an error about `No file digest algorithm specified. Please specify the digest algorithm with the /fd flag. Using /fd SHA256 is recommended and more secure than SHA1. Calling signtool with /fd sha1 is equivalent to the previous behavior. In order to select the hash algorithm used in the signing certificate's signature, use the /fd certHash option.`, right click the project > `Configuration Properties` > `Driver Signing` > `General` > `File Digest Algorithm` > `SHA256`.
 * Newer versions of the WDK do not accept `Sample` as a class name in the INF file, and you'll also need to generate a new GUID.
+* Don't try to use C++ modules in kernel projects -- VS bugs out and locks the IFC files, causing compilation failures, [similar to this issue](https://developercommunity2.visualstudio.com/t/C-modules-compilation:-error-C3474-co/1130956). This happens regardless of setting the standard to C++20 and the only way to solve the issue is to manually kills language server process in Task Manager, which is a pain.
 
 ## Additional resources
 
