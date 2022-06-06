@@ -38,5 +38,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="install-driver.bat">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

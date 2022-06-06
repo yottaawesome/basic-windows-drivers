@@ -194,7 +194,14 @@
     <Inf Include="EmptyKMDFDriver.inf" />
   </ItemGroup>
   <ItemGroup>
-    <FilesToPackage Include="$(TargetPath)" />
+    <FilesToPackage Include="A:\Code\cpp\basic-windows-drivers\src\x64\Debug\EmptyKMDFDriver.sys">
+      <PackageRelativeDirectory>
+      </PackageRelativeDirectory>
+    </FilesToPackage>
+    <FilesToPackage Include="install-driver.bat" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      <PackageRelativeDirectory>
+      </PackageRelativeDirectory>
+    </FilesToPackage>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp" />
@@ -204,6 +211,7 @@
     <ClInclude Include="IO.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="install-driver.bat" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
