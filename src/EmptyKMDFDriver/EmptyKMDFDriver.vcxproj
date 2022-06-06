@@ -127,9 +127,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
+    <IncludePath>$(ProjectDir)include;$(IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <IncludePath>$(ProjectDir)include;$(IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
@@ -204,11 +206,11 @@
     </FilesToPackage>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Driver.cpp" />
-    <ClCompile Include="IO.cpp" />
+    <ClCompile Include="src\Driver.cpp" />
+    <ClCompile Include="src\IO.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IO.hpp" />
+    <ClInclude Include="include\IO.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="install-driver.bat" />

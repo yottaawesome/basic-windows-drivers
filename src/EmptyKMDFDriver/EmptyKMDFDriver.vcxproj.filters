@@ -24,15 +24,15 @@
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Driver.cpp">
+    <ClCompile Include="src\Driver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IO.cpp">
+    <ClCompile Include="src\IO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IO.hpp">
+    <ClInclude Include="include\IO.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

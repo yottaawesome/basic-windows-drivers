@@ -6,6 +6,7 @@ ClassGuid   = {A5963840-3CE7-4326-B35B-F1045F2A4760}
 CatalogFile = "WFPCalloutDriver.cat"
 DriverVer = 01/15/05,1.0
 PnpLockdown = 1
+LegacyUninstall = 1
 
 [SourceDisksNames]
 1 = %DiskName%
