@@ -10,7 +10,7 @@ You'll need to first configure a target machine or VM for deployment and debuggi
 
 ## Building
 
-You need Visual Studio 2022 and the [latest Windows Driver Kit (WDK) and accompanying SDK](https://docs.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk) to build and develop kernel components. If you receive obscure build errors related to inf2cat to dates in the `DriverVer` field in the `*.inf` files, ensure that in `Project Properties > Configuration Properties > Inf2Cat > General > Use local time` is set to `Yes (/uselocaltime)`. See [here](https://stackoverflow.com/questions/14148500/int2cat-driverver-set-to-incorrect-date) and [here](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/stampinf-command-options) for additional information. You may need to rebuild more than if you receive some errors after doing a full solution clean.
+You need Visual Studio 2022 and the [latest Windows Driver Kit (WDK) and accompanying SDK](https://docs.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk) to build and develop kernel components. If you receive obscure build errors related to inf2cat to dates in the `DriverVer` field in the `*.inf` files, ensure that in `Project Properties > Configuration Properties > Inf2Cat > General > Use local time` is set to `Yes (/uselocaltime)`. See [here](https://stackoverflow.com/questions/14148500/int2cat-driverver-set-to-incorrect-date) and [here](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/stampinf-command-options) for additional information. You may need to rebuild more than if you receive some errors after doing a full solution clean. There may some absolute paths (for my machine) referenced in the project files that you may need to adjust or remove for your local environment.
 
 ## Deploying
 
@@ -50,3 +50,4 @@ See the [step-by-step lab](https://docs.microsoft.com/en-us/windows-hardware/dri
 * [Pavel Yosifovich's tools](https://github.com/zodiacon/AllTools)
 * [Sysinternals utilities](https://docs.microsoft.com/en-us/sysinternals/downloads/)
 * [Managing hardware priorities](https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/managing-hardware-priorities)
+* [Developing Drivers with the Windows Driver Foundation](https://docs.microsoft.com/en-us/windows-hardware/drivers/wdf/developing-drivers-with-wdf) by Penny Orwick and Guy Smith. This is a useful book for writing Windows kernel drivers using the more modern WDF (as opposed to WDM) approach.
