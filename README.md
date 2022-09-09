@@ -14,7 +14,7 @@ You need Visual Studio 2022 and the [latest Windows Driver Kit (WDK) and accompa
 
 ## Deploying
 
-Provisioned VMs require binaries to be signed, or they'll be blocked by Microsoft Defender. As part of the VM provisioning process, development certificates for signing drivers will be generated. The `SignTool` comes with the Windows Kit (e.g. under `C:\Program Files (x86)\Windows Kits\10\App Certification Kit\`) and can be used like so to sign a binary: `SignTool.exe Sign -A -V <binary_path>`.
+Provisioned VMs require binaries to be signed, or they'll be blocked by Microsoft Defender. As part of the VM provisioning process, development certificates for signing drivers will be generated, but you may still need to [generate self-signed test certificates yourself](https://docs.microsoft.com/en-us/windows-hardware/drivers/install/how-to-test-sign-a-driver-package). The `SignTool` comes with the Windows Kit (e.g. under `C:\Program Files (x86)\Windows Kits\10\App Certification Kit\`) and can be used like so to sign a binary: `SignTool.exe Sign /a /v /fd SHA256 <binary_path>` (note that older versions did not require the `fd` argument).
 
 ## WinDbg
 
