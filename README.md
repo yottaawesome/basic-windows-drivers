@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Basic experimentation with Windows drivers [based off the MSDN docs](https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/writing-a-very-small-kmdf--driver) and Pavel Yosifovich's [Windows Kernel Programming book](https://leanpub.com/windowskernelprogramming).
+Basic experimentation with Windows drivers [based off the MSDN docs](https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/writing-a-very-small-kmdf--driver), Pavel Yosifovich's [Windows Kernel Programming book](https://leanpub.com/windowskernelprogramming) and [Developing Drivers with the Windows Driver Foundation](https://docs.microsoft.com/en-us/windows-hardware/drivers/wdf/developing-drivers-with-wdf) by Penny Orwick and Guy Smith.
 
 ## Debugging
 
