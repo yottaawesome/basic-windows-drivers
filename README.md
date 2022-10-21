@@ -35,6 +35,9 @@ See the [step-by-step lab](https://docs.microsoft.com/en-us/windows-hardware/dri
 * Newer versions of the WDK do not accept `Sample` as a class name in the INF file, and you'll also need to generate a new GUID.
 * Don't try to use C++ modules in kernel projects -- VS seemingly bugs out and locks the IFC files, causing compilation failures. [This is apparently a WDK issue](https://developercommunity.visualstudio.com/t/c-modules-in-kmdf-project/1560782). This happens regardless of setting the standard to C++20, and the only way to solve the issue is to manually kill the language server processes in Task Manager, which is a pain.
 * For the Windows kernel, C++ is a fully-viable and effective language option for drivers. However, you don't have access to the STL and the C++ runtime is unavailable, which means no exception support, by default. That being said, you can find a kernel-ready implementation of the STL via [Johnny Shaw's stlkrn](https://github.com/jxy-s/stlkrn) and you can enable C++ exceptions using [Martin Vejnár's vcrtl](https://github.com/avakar/vcrtl). I've not used them personally, so I can't vouch for them.
+* In the Windows registry, installed drivers are located under the `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services` key.
+* When drivers are installed, Windows will copy the driver's INF file and referenced files to the [driver store](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/driver-store), which appears to be the `%SYSTEMROOT\System32\DriverStore` directory. This behaviour was introduced in Windows Vista.
+* If you stop a driver and then restart it (e.g. via the `net stop` and `net start` commands) and you get a "file not found error", check to see that your driver cleans up all resources before exiting. Certain resources, such as callouts, not being cleaned up [can cause this issue](https://stackoverflow.com/a/69284447/7448661).
 
 ## Additional resources
 
