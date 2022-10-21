@@ -20,7 +20,7 @@ You must first [provision a VM](https://docs.microsoft.com/en-us/windows-hardwar
 * On the target machine, open an elevated command prompt and `cd` to `%systemdrive%\drivertest\drivers`.
 * Run `driver-install.cmd` to install the driver. Run `driver-install.cmd -r` to uninstall the driver.
 
-If you uninstall and the re-install the driver, you may get a service start "file not found" error. Restart the machine in this case and the driver will run normally.
+If you uninstall and the re-install the driver, you may get a service start "file not found" error. In this case, check to see that all registered callouts are being unregistered before the driver exits. [Failure to do so can cause this issue](https://stackoverflow.com/a/69284447/7448661).
 
 ## Running
 
