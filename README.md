@@ -38,6 +38,7 @@ See the [step-by-step lab](https://docs.microsoft.com/en-us/windows-hardware/dri
 * In the Windows registry, installed drivers are located under the `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services` key.
 * When drivers are installed, Windows will copy the driver's INF file and referenced files to the [driver store](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/driver-store), which appears to be the `%SYSTEMROOT%\System32\DriverStore` directory. This behaviour was introduced in Windows Vista.
 * If you stop a driver and then restart it (e.g. via the `net stop` and `net start` commands) and you get a "file not found" error, check to see that your driver cleans up all resources before exiting. Certain resources, such as callouts, not being cleaned up [can cause this issue](https://stackoverflow.com/a/69284447/7448661).
+* When invoking any native Microsoft functions in the kernel, it's worthwhile checking the MSDN docs to ensure that you are running at the required IRQL to invoke those functions. This is because certain functions require the driver to be running at, above, or below a certain IRQL. Failure to do so will cause the function to fail or possibly bugcheck the system.
 
 ## Additional resources
 
