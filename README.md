@@ -56,3 +56,4 @@ See the [step-by-step lab](https://docs.microsoft.com/en-us/windows-hardware/dri
 * [Sysinternals utilities](https://docs.microsoft.com/en-us/sysinternals/downloads/)
 * [Managing hardware priorities](https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/managing-hardware-priorities)
 * [Developing Drivers with the Windows Driver Foundation](https://docs.microsoft.com/en-us/windows-hardware/drivers/wdf/developing-drivers-with-wdf) by Penny Orwick and Guy Smith. This is a useful book for writing Windows kernel drivers using the more modern WDF (as opposed to WDM) approach.
+* [Using SAL Annotations to Reduce C/C++ Code Defects](https://learn.microsoft.com/en-us/cpp/code-quality/using-sal-annotations-to-reduce-c-cpp-code-defects): SAL is used extensively by Microsoft, inlcuding in kernel code, to annotate functions with their behaviour, so this resource is useful if you're unfamiliar with applying SAL.
